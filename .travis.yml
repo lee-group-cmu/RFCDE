@@ -4,7 +4,7 @@ matrix:
       sudo: false
       python: "3.6"
       before_install: cd python
-      install: pip install tox-travis
+      install: pip install tox-travis numpy cython
       script: tox -v
     - language: r
       cache: packages
