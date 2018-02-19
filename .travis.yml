@@ -4,11 +4,13 @@ matrix:
       sudo: false
       python:
           - "2.7"
+      before_install: cd python
       before_script: cd python
       install: pip install tox-travis
       script: tox -v
     - language: r
       cache: packages
+      before_install: cd r
       before_script: cd r
       r_binary_packages:
         - devtools
