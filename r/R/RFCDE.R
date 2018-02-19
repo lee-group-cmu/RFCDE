@@ -1,0 +1,97 @@
+#' Fits a conditional density estimate random forest to training data.
+#'
+#' @param x_train a matrix of training covariates.
+#' @param z_train a matrix of training responses.
+#' @param n_trees the number of trees in the forest.
+#' @param mtry the number of candidate variables to try for each
+#'   split.
+#' @param node_size the minimum number of observations in a leaf node.
+#' @param n_basis the number of basis functions used in split density
+#'   estimates.
+#' @param basis_system the system of basis functions to use;
+#'   currently "cosine" and "Haar" are supported.
+#' @export
+RFCDE <- function(x_train, z_train, n_trees, mtry, node_size, n_basis,
+                      basis_system = "cosine") {
+  if (!is.matrix(x_train)) { x_train <- as.matrix(x_train) }
+  if (!is.matrix(z_train)) { z_train <- as.matrix(z_train) }
+  mtry <- min(mtry, ncol(x_train))
+
+  z_min <- apply(z_train, 2, min)
+  z_max <- apply(z_train, 2, max)
+  basis_fn <- switch(basis_system,
+                     "cosine" = cosine_basis,
+                     "Haar" = haar_basis,
+                     stop(paste(basis_system, "not recognized")))
+  z_basis <- basis_fn(box(z_train, z_min, z_max), n_basis)
+
+  forest <- methods::new(ForestRcpp)
+  forest$train(x_train, z_basis, n_trees, mtry, node_size)
+
+  return(structure(list(z_train = z_train, rcpp = forest), class = "RFCDE"))
+}
+
+#' Obtains weights from RFCDE object.
+#'
+#' Provides weights for the training data reflecting co-occurance in
+#' leaf nodes of the forest.
+#'
+#' @param forest A RFCDE object.
+#' @param x_test A vector of test covariates.
+#' @return A vector of weights counting the number of co-occurances in leaf nodes of the forest.
+weights <- function(forest, x_test) {
+  weights <- rep(0L, nrow(forest$z_train))
+  forest$rcpp$fill_weights(x_test, weights)
+  return(weights)
+}
+
+#' Helper function for kernel density estimation.
+#'
+#' @param z_train matrix of training covariates.
+#' @param z_grid matrix of grid points to evaluate densities.
+#' @param weights vector of weights.
+#' @param bandwidth bandwidth value or matrix.
+#' @return A vector of the density estimated at z_grid
+kde_estimate <- function(z_train, z_grid, weights, bandwidth = NULL) {
+  if (ncol(z_train) == 1) {
+    if (is.null(bandwidth)) { bandwidth <- ks::hpi(x = z_train) }
+    return(ks::kde(z_train, h = bandwidth,
+                   eval.points = z_grid, w = weights)$estimate)
+  } else {
+    if (is.null(bandwidth)) { bandwidth <- ks::Hpi(x = z_train) }
+    return(ks::kde(z_train, H = bandwidth,
+                   eval.points = z_grid, w = weights)$estimate)
+  }
+}
+
+#' Predict conditional density estimates for RFCDE objects.
+#'
+#' @usage \method{predict}{RFCDE}(object, newdata, z_grid, bandwidth, ...)
+#'
+#' @param object a RFCDE object.
+#' @param newdata matrix of test covariates.
+#' @param z_grid grid points at which to evaluate the kernel density.
+#' @param bandwidth (optional) bandwidth for kernel density estimates.
+#' @param ... additional arguments
+#' @export
+predict.RFCDE <- function(object, newdata, z_grid, bandwidth = NULL, ...) {
+  n_train <- nrow(object$z_train)
+  n_dim <- nrow(object$z_train)
+
+  if (is.data.frame(newdata)) { newdata <- as.matrix(newdata) }
+  if (is.vector(newdata)) { newdata <- matrix(newdata, ncol = n_dim) }
+  stopifnot(is.matrix(newdata))
+  if (!is.matrix(z_grid)) { z_grid <- as.matrix(z_grid) }
+
+  n_test <- nrow(newdata)
+
+  cde <- matrix(NA, n_test, nrow(z_grid))
+  wts <- rep(0L, n_train)
+  for (ii in seq_len(n_test)) {
+    wts <- weights(object, newdata[ii, ])
+    wts <- wts * n_train / sum(wts)
+    cde[ii, ] <- kde_estimate(object$z_train, z_grid, wts, bandwidth)
+  }
+
+  return(cde)
+}

@@ -1,0 +1,19 @@
+Package: RFCDE
+Type: Package
+Title: Random Forests for Conditional Density Estimation
+Version: 0.1
+Author: Taylor Pospisil
+Maintainer: Taylor Pospisil <tpospisi@andrew.cmu.edu>
+Description: Fits random forest conditional density estimates using
+             conditional density loss for splits.
+URL: https://github.com/tpospisi/RFCDE/r
+BugReports: https://github.com/tpospisi/RFCDE/issues
+License: MIT + file LICENSE
+Depends: R (>= 3.4.3)
+Imports: Rcpp (>= 0.12.15),
+    ks,
+    methods
+LinkingTo: Rcpp
+RoxygenNote: 6.0.1
+Suggests: testthat
+RcppModules: RFCDEModule
