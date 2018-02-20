@@ -6,7 +6,7 @@ Author: Taylor Pospisil
 Maintainer: Taylor Pospisil <tpospisi@andrew.cmu.edu>
 Description: Fits random forest conditional density estimates using
              conditional density loss for splits.
-URL: https://github.com/tpospisi/RFCDE/r
+URL: https://github.com/tpospisi/RFCDE/tree/master/r
 BugReports: https://github.com/tpospisi/RFCDE/issues
 License: MIT + file LICENSE
 Depends: R (>= 3.4.2)
