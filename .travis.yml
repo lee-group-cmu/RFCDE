@@ -1,16 +1,24 @@
 matrix:
   include:
-    - language: python
-      sudo: false
-      python: "3.6"
-      before_install: cd python
-      install: pip install tox-travis numpy cython
-      script: tox -v
-    - language: r
-      cache: packages
-      before_install: cd r
-      r_binary_packages:
-        - devtools
-        - roxygen2
-      after_success:
-        - Rscript -e 'devtools::install(); devtools::test()'
+  - language: python
+    sudo: false
+    python: '3.6'
+    before_install: cd python
+    install: pip install tox-travis numpy cython
+    script: tox -v
+    before_deploy: cd python
+    deploy:
+      provider: pypi
+      on:
+        tags: true
+      user: tpospisi
+      password:
+        secure: Pw8EcfIo4sOOiEa7Ys1bNQaIRxuOmNVCLpMEId+JtwvVVOVDHaW1bcsV9OqmxXqVQVTugdksYsB8ghAeHN+UO4TYN0A76o5LHYrPtK+lMh7YeCwxZrTVGsz62hjpMtovfB+cIhCVeWYvC6Bu/X4h1ItDD4bP08DzMha+dahO4u0r3ojJcK461lS07jhIb1aU7J5Q2n06RKbXr9+raIZL75IZlkBzILakdMkN9iPIK1raq44I4iSTzg8F7Kn9o0o9jwjszEhNpZqwiIkPXEvfWlHtryZjsn2ZlvZBT6pvvDyF3hUF89Br6KMnm06AtKfRvTvzAZta79vuuM3MVQK7Cyc1BA2oNGuwYyko7OwgURD0eCqEGg+PuXuQvMqJWXZR5CcLzqbfgmLri6HVsB7BwHsdpFrIhQ6yjlIFVdoy242sot4wEQANQCftfAfUdqG2YScWPnvdt5hlYzZKsViWFq9xQRSsydj7HORCyTzzG/uRuelNJkiJIN2UOIRky4TRxZyInLFvU9ewz3FaZfeyLJJVhMeEmN91EBZFCXH4vKOCoI0SZVr3Wr4bkDALZvUYuGczdaap1Gwdaf2+GGzYIq6vLtgAMRLGFJL2V7FJjMHax0f0NE1kOkiOlT2oCOvbD6y66nlQSSVnNdCG3qgAJ487HKXoo7d7N4wlCShrbMs=
+  - language: r
+    cache: packages
+    before_install: cd r
+    r_binary_packages:
+    - devtools
+    - roxygen2
+    after_success:
+    - Rscript -e 'devtools::install(); devtools::test()'
