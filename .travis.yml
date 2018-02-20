@@ -6,7 +6,6 @@ matrix:
     before_install: cd python
     install: pip install tox-travis numpy cython
     script: tox -v
-    before_deploy: cd python
     deploy:
       provider: pypi
       on:
