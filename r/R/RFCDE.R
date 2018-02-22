@@ -36,13 +36,19 @@ RFCDE <- function(x_train, z_train, n_trees, mtry, node_size, n_basis,
 #' Provides weights for the training data reflecting co-occurance in
 #' leaf nodes of the forest.
 #'
-#' @param forest A RFCDE object.
-#' @param x_test A vector of test covariates.
-#' @return A vector of weights counting the number of co-occurances in leaf nodes of the forest.
-weights <- function(forest, x_test) {
-  weights <- rep(0L, nrow(forest$z_train))
-  forest$rcpp$fill_weights(x_test, weights)
-  return(weights)
+#' @usage \method{weights}{RFCDE}(object, newdata, ...)
+#'
+#' @param object A RFCDE object.
+#' @param newdata A vector of test covariates.
+#' @param \dots Other arguments
+#' @return A vector of weights counting the number of co-occurances in
+#'   leaf nodes of the forest.
+#' @importFrom stats weights
+#' @export
+weights.RFCDE <- function(object, newdata, ...) {
+  wts <- rep(0L, nrow(object$z_train))
+  object$rcpp$fill_weights(newdata, wts)
+  return(wts)
 }
 
 #' Helper function for kernel density estimation.
@@ -72,7 +78,8 @@ kde_estimate <- function(z_train, z_grid, weights, bandwidth = NULL) {
 #' @param newdata matrix of test covariates.
 #' @param z_grid grid points at which to evaluate the kernel density.
 #' @param bandwidth (optional) bandwidth for kernel density estimates.
-#' @param ... additional arguments
+#' @param \dots additional arguments
+#' @importFrom stats predict
 #' @export
 predict.RFCDE <- function(object, newdata, z_grid, bandwidth = NULL, ...) {
   n_train <- nrow(object$z_train)

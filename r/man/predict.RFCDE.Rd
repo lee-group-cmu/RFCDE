@@ -15,7 +15,7 @@
 
 \item{bandwidth}{(optional) bandwidth for kernel density estimates.}
 
-\item{...}{additional arguments}
+\item{\dots}{additional arguments}
 }
 \description{
 Predict conditional density estimates for RFCDE objects.
