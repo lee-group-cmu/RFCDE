@@ -46,8 +46,15 @@ RFCDE <- function(x_train, z_train, n_trees, mtry, node_size, n_basis,
 #' @importFrom stats weights
 #' @export
 weights.RFCDE <- function(object, newdata, ...) {
-  wts <- rep(0L, nrow(object$z_train))
-  object$rcpp$fill_weights(newdata, wts)
+  if (!is.matrix(newdata)) {
+    newdata <- matrix(newdata, nrow = 1)
+  }
+  wts <- matrix(NA, nrow(newdata), nrow(object$z_train))
+  for (ii in seq_len(nrow(newdata))) {
+    tmp <- rep(0L, nrow(object$z_train))
+    object$rcpp$fill_weights(newdata[ii, ], tmp)
+    wts[ii, ] <- tmp
+  }
   return(wts)
 }
 

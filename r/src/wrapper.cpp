@@ -34,7 +34,6 @@ public:
   }
 
   void fill_weights(Rcpp::NumericVector x_test, Rcpp::IntegerVector weights) {
-    std::fill(weights.begin(), weights.end(), 0);
     obj.fill_weights(&x_test(0), &weights(0));
   }
 };
