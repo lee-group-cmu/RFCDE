@@ -36,6 +36,26 @@ RFCDE <- function(x_train, z_train, n_trees, mtry, node_size, n_basis,
                         rcpp = forest), class = "RFCDE"))
 }
 
+#' Print method for RFCDE objects
+#'
+#' @param x A RFCDE object.
+print.RFCDE <- function(x, ...) {
+  cat(format(x, ...), sep = "\n")
+}
+
+summary.RFCDE <- function(x, ...) {
+  print(x)
+}
+
+#' Format method for RFCDE objects
+#'
+#' @param x A RFCDE object.
+format.RFCDE <- function(x, ...) {
+  return(c("RFCDE object:",
+           paste("n_train =", nrow(x$z_train)),
+           paste("OOB =", x$fit_oob)))
+}
+
 #' Obtains weights from RFCDE object.
 #'
 #' Provides weights for the training data reflecting co-occurance in
