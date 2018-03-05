@@ -1,32 +1,5 @@
 context("Test prediction performance")
 
-cde_loss <- function(cdes, z_grid, z_test) {
-  if (!is.matrix(z_grid)) {
-    z_grid <- as.matrix(z_grid)
-  }
-
-  if (!is.matrix(z_test)) {
-    z_test <- as.matrix(z_test)
-  }
-
-  stopifnot(nrow(cdes) == nrow(z_test))
-  stopifnot(ncol(cdes) == nrow(z_grid))
-  stopifnot(ncol(z_grid) == ncol(z_test))
-
-  z_min <- apply(z_grid, 2, min)
-  z_max <- apply(z_grid, 2, max)
-  z_delta <- prod(z_max - z_min) / nrow(z_grid)
-
-  integrals <- z_delta * rowSums(cdes ^ 2)
-
-  nn_ids <- vapply(z_test, function(xx) which.min(abs(z_grid - xx)), 1L)
-  likeli <- cdes[cbind(seq_len(nrow(z_test)), nn_ids)]
-
-  losses <- integrals - 2 * likeli
-
-  return(mean(losses))
-}
-
 test_that("Beta example performance", {
   set.seed(42)
 
@@ -55,7 +28,7 @@ test_that("Beta example performance", {
   n_grid <- 1000
   z_grid <- seq(0, 5.0, length.out = n_grid)
   density <- predict(forest, x_test, z_grid, bandwidth = bandwidth)
-  loss <- cde_loss(density, z_grid, z_test)
+  loss <- cdetools::cde_loss(density, z_grid, z_test)$loss
 
   expect_lt(loss, -1.8)
 })
