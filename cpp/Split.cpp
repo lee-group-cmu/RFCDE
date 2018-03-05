@@ -40,7 +40,7 @@ Split find_best_split(double* x_train, double* z_basis,
       last_var = var;
     }
 
-    Split split = evaluate_split(z_basis, weights, idx_begin, idx_end,
+    Split split = evaluate_split(x_train, z_basis, weights, idx_begin, idx_end,
                                  n_train, n_basis, node_size,
                                  total_weight, total_sum);
 
@@ -54,7 +54,8 @@ Split find_best_split(double* x_train, double* z_basis,
 }
 
 
-Split evaluate_split(const double* z_basis, const std::vector<int>& weights,
+Split evaluate_split(const double* x_train, const double* z_basis,
+                     const std::vector<int>& weights,
                      const ivecit idx_begin, const ivecit idx_end,
                      int n_train, int n_basis, int node_size,
                      int total_weight, const std::vector<double>& total_sum) {
@@ -67,6 +68,7 @@ Split evaluate_split(const double* z_basis, const std::vector<int>& weights,
   // for each side of the split.
   //
   // Arguments:
+  //   x_train: pointer to covariate vector.
   //   z_basis: pointer to basis function evaluations.
   //   weights: vector of bootstrap weights.
   //   idx: pointer to array of valid indices.
@@ -104,7 +106,7 @@ Split evaluate_split(const double* z_basis, const std::vector<int>& weights,
         (total_weight - le_weight);
     }
 
-    if (loss < best_split.loss) {
+    if (loss < best_split.loss && x_train[*it] != x_train[*(it + 1)]) {
       best_split.loss = loss;
       best_split.offset = it - idx_begin;
     }
