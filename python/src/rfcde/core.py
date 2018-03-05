@@ -122,6 +122,26 @@ class RFCDE(object):
         """
         return self.forest.weights(x_new)
 
+    def oob_weights(self):
+        """Calculates out-of-bag weights from forest tree structure.
+
+        Returns
+        -------
+        numpy matrix
+            A matrix with element [ii, jj] being the out-of-bag weight
+            for training point jj when predicting for training point
+            ii.
+
+        Raises
+        ------
+        ValueError
+            If the forest was not fit with out-of-bag samples.
+
+        """
+        if not self.fit_oob:
+            raise ValueError("Forest was not fit with out-of-bag samples")
+        return self.forest.oob_weights()
+
     def predict(self, x_new, z_grid, bandwidth):
         """Calculate KDE conditional density estimate for new observations.
 

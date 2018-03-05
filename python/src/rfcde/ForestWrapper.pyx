@@ -1,4 +1,5 @@
 cimport cython
+from libcpp cimport bool
 
 import numpy as np
 cimport numpy as np
@@ -10,8 +11,9 @@ cdef extern from "Forest.h":
         # Methods
         void train(double* x_train, double* z_basis,
                    int n_train, int n_var, int n_basis, int n_trees, int mtry,
-                   int node_size)
+                   int node_size, bool fit_oob)
         void fill_weights(double* x_test, long* wt_buf);
+        void fill_oob_weights(long* wt_mat);
 
 cdef class ForestWrapper:
     """Wrapper for C++ implementation of RFCDE forests.
@@ -39,7 +41,7 @@ cdef class ForestWrapper:
     @cython.wraparound(False)
     def train(self, np.ndarray[double, ndim=2, mode="fortran"] x_train,
               np.ndarray[double, ndim=2, mode="fortran"] z_basis, long n_trees,
-              long mtry, long node_size):
+              long mtry, long node_size, bool fit_oob=False):
         """Trains RFCDE on training data.
 
         Arguments
@@ -57,6 +59,8 @@ cdef class ForestWrapper:
             The number of variables to evaluate at each split.
         node_size : integer
             The minimum number of observations in each leaf node.
+        fit_oob : boolean
+            Whether to fit out-of-bag samples. Defaults to False.
         """
         self.n_train = x_train.shape[0]
 
@@ -70,7 +74,7 @@ cdef class ForestWrapper:
         # Pass in pointers of numpy matrices/arrays
         self.Cpp_Class.train(&x_train[0,0], &z_basis[0,0], n_train,
                              n_var, n_basis, n_trees_i, mtry_i,
-                             node_size_i)
+                             node_size_i, fit_oob)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -99,3 +103,12 @@ cdef class ForestWrapper:
         wt_buf = np.zeros(self.n_train, dtype=int)
         self.fill_weights(x_test, wt_buf)
         return wt_buf
+
+
+    def fill_oob_weights(self, np.ndarray[long, ndim=2, mode="fortran"] wt_mat):
+        self.Cpp_Class.fill_oob_weights(&wt_mat[0,0])
+
+    def oob_weights(self):
+        wt_mat = np.zeros(self.n_train, self.n_train, dtype=int, order="F")
+        self.fill_oob_weights(wt_mat)
+        return wt_mat

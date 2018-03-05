@@ -1098,8 +1098,8 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
  */
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
 
-/* "rfcde/ForestWrapper.pyx":16
- *         void fill_weights(double* x_test, long* wt_buf);
+/* "rfcde/ForestWrapper.pyx":18
+ *         void fill_oob_weights(long* wt_mat);
  * 
  * cdef class ForestWrapper:             # <<<<<<<<<<<<<<
  *     """Wrapper for C++ implementation of RFCDE forests.
@@ -1302,6 +1302,17 @@ static CYTHON_INLINE PyObject *__Pyx_PyCFunction_FastCall(PyObject *func, PyObje
 #else
 #define __Pyx_PyCFunction_FastCall(func, args, nargs)  (assert(0), NULL)
 #endif
+
+/* BufferIndexError.proto */
+static void __Pyx_RaiseBufferIndexError(int axis);
+
+/* PyObjectCallMethO.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
+#endif
+
+/* PyObjectCallOneArg.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
 
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
@@ -1612,6 +1623,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 /* Module declarations from 'cython' */
 
+/* Module declarations from 'libcpp' */
+
 /* Module declarations from 'cpython.buffer' */
 
 /* Module declarations from 'libc.string' */
@@ -1655,6 +1668,7 @@ static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_RuntimeError;
 static PyObject *__pyx_builtin_ImportError;
+static const char __pyx_k_F[] = "F";
 static const char __pyx_k_np[] = "np";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_mtry[] = "mtry";
@@ -1662,12 +1676,14 @@ static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_dtype[] = "dtype";
 static const char __pyx_k_numpy[] = "numpy";
+static const char __pyx_k_order[] = "order";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_zeros[] = "zeros";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_wt_buf[] = "wt_buf";
 static const char __pyx_k_x_test[] = "x_test";
+static const char __pyx_k_fit_oob[] = "fit_oob";
 static const char __pyx_k_n_trees[] = "n_trees";
 static const char __pyx_k_x_train[] = "x_train";
 static const char __pyx_k_z_basis[] = "z_basis";
@@ -1682,6 +1698,7 @@ static const char __pyx_k_RuntimeError[] = "RuntimeError";
 static const char __pyx_k_fill_weights[] = "fill_weights";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
+static const char __pyx_k_fill_oob_weights[] = "fill_oob_weights";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
@@ -1692,6 +1709,7 @@ static const char __pyx_k_ndarray_is_not_Fortran_contiguou[] = "ndarray is not F
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static const char __pyx_k_numpy_core_umath_failed_to_impor[] = "numpy.core.umath failed to import";
 static const char __pyx_k_Format_string_allocated_too_shor_2[] = "Format string allocated too short.";
+static PyObject *__pyx_n_s_F;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
 static PyObject *__pyx_n_s_ImportError;
@@ -1701,7 +1719,9 @@ static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_n_s_ValueError;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_dtype;
+static PyObject *__pyx_n_s_fill_oob_weights;
 static PyObject *__pyx_n_s_fill_weights;
+static PyObject *__pyx_n_s_fit_oob;
 static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_main;
@@ -1716,6 +1736,7 @@ static PyObject *__pyx_n_s_np;
 static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_kp_s_numpy_core_multiarray_failed_to;
 static PyObject *__pyx_kp_s_numpy_core_umath_failed_to_impor;
+static PyObject *__pyx_n_s_order;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
@@ -1732,11 +1753,13 @@ static PyObject *__pyx_n_s_zeros;
 static int __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper___init__(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self); /* proto */
 static int __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_2__cinit__(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self); /* proto */
 static void __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_4__dealloc__(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, PyArrayObject *__pyx_v_x_train, PyArrayObject *__pyx_v_z_basis, long __pyx_v_n_trees, long __pyx_v_mtry, long __pyx_v_node_size); /* proto */
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, PyArrayObject *__pyx_v_x_train, PyArrayObject *__pyx_v_z_basis, long __pyx_v_n_trees, long __pyx_v_mtry, long __pyx_v_node_size, bool __pyx_v_fit_oob); /* proto */
 static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_8fill_weights(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, PyArrayObject *__pyx_v_x_test, PyArrayObject *__pyx_v_wt_buf); /* proto */
 static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_10weights(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, PyArrayObject *__pyx_v_x_test); /* proto */
-static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_12__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_14__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_12fill_oob_weights(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, PyArrayObject *__pyx_v_wt_mat); /* proto */
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_14oob_weights(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_16__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_18__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static PyObject *__pyx_tp_new_5rfcde_13ForestWrapper_ForestWrapper(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
@@ -1752,7 +1775,7 @@ static PyObject *__pyx_tuple__9;
 static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__11;
 
-/* "rfcde/ForestWrapper.pyx":31
+/* "rfcde/ForestWrapper.pyx":33
  * 
  *     # Boilerplate
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -1781,7 +1804,7 @@ static int __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper___init__(struct __pyx
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "rfcde/ForestWrapper.pyx":32
+  /* "rfcde/ForestWrapper.pyx":34
  *     # Boilerplate
  *     def __init__(self):
  *         self.n_train = -1             # <<<<<<<<<<<<<<
@@ -1790,7 +1813,7 @@ static int __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper___init__(struct __pyx
  */
   __pyx_v_self->n_train = -1;
 
-  /* "rfcde/ForestWrapper.pyx":31
+  /* "rfcde/ForestWrapper.pyx":33
  * 
  *     # Boilerplate
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -1804,7 +1827,7 @@ static int __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper___init__(struct __pyx
   return __pyx_r;
 }
 
-/* "rfcde/ForestWrapper.pyx":33
+/* "rfcde/ForestWrapper.pyx":35
  *     def __init__(self):
  *         self.n_train = -1
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -1834,7 +1857,7 @@ static int __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_2__cinit__(struct __p
   Forest *__pyx_t_1;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "rfcde/ForestWrapper.pyx":34
+  /* "rfcde/ForestWrapper.pyx":36
  *         self.n_train = -1
  *     def __cinit__(self):
  *         self.Cpp_Class = new Forest()             # <<<<<<<<<<<<<<
@@ -1845,11 +1868,11 @@ static int __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_2__cinit__(struct __p
     __pyx_t_1 = new Forest();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(1, 34, __pyx_L1_error)
+    __PYX_ERR(1, 36, __pyx_L1_error)
   }
   __pyx_v_self->Cpp_Class = __pyx_t_1;
 
-  /* "rfcde/ForestWrapper.pyx":33
+  /* "rfcde/ForestWrapper.pyx":35
  *     def __init__(self):
  *         self.n_train = -1
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -1868,7 +1891,7 @@ static int __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_2__cinit__(struct __p
   return __pyx_r;
 }
 
-/* "rfcde/ForestWrapper.pyx":35
+/* "rfcde/ForestWrapper.pyx":37
  *     def __cinit__(self):
  *         self.Cpp_Class = new Forest()
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -1891,7 +1914,7 @@ static void __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_4__dealloc__(struct 
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "rfcde/ForestWrapper.pyx":36
+  /* "rfcde/ForestWrapper.pyx":38
  *         self.Cpp_Class = new Forest()
  *     def __dealloc__(self):
  *         del self.Cpp_Class             # <<<<<<<<<<<<<<
@@ -1900,7 +1923,7 @@ static void __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_4__dealloc__(struct 
  */
   delete __pyx_v_self->Cpp_Class;
 
-  /* "rfcde/ForestWrapper.pyx":35
+  /* "rfcde/ForestWrapper.pyx":37
  *     def __cinit__(self):
  *         self.Cpp_Class = new Forest()
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -1912,33 +1935,36 @@ static void __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_4__dealloc__(struct 
   __Pyx_RefNannyFinishContext();
 }
 
-/* "rfcde/ForestWrapper.pyx":40
+/* "rfcde/ForestWrapper.pyx":42
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     def train(self, np.ndarray[double, ndim=2, mode="fortran"] x_train,             # <<<<<<<<<<<<<<
  *               np.ndarray[double, ndim=2, mode="fortran"] z_basis, long n_trees,
- *               long mtry, long node_size):
+ *               long mtry, long node_size, bool fit_oob=False):
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_7train(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_5rfcde_13ForestWrapper_13ForestWrapper_6train[] = "Trains RFCDE on training data.\n\n        Arguments\n        ---------\n        x_train : numpy matrix\n            The training covariates. Must be stored in \"fortran\" mode.\n        z_basis : numpy matrix\n            The training responses evaluated at basis functions; each\n            column corresponds to a basis function, each row\n            corresponds to an observation. Must be stored in \"fortran\"\n            mode.\n        n_trees : integer\n            The number of trees to train.\n        mtry : integer\n            The number of variables to evaluate at each split.\n        node_size : integer\n            The minimum number of observations in each leaf node.\n        ";
+static char __pyx_doc_5rfcde_13ForestWrapper_13ForestWrapper_6train[] = "Trains RFCDE on training data.\n\n        Arguments\n        ---------\n        x_train : numpy matrix\n            The training covariates. Must be stored in \"fortran\" mode.\n        z_basis : numpy matrix\n            The training responses evaluated at basis functions; each\n            column corresponds to a basis function, each row\n            corresponds to an observation. Must be stored in \"fortran\"\n            mode.\n        n_trees : integer\n            The number of trees to train.\n        mtry : integer\n            The number of variables to evaluate at each split.\n        node_size : integer\n            The minimum number of observations in each leaf node.\n        fit_oob : boolean\n            Whether to fit out-of-bag samples. Defaults to False.\n        ";
 static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_7train(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_x_train = 0;
   PyArrayObject *__pyx_v_z_basis = 0;
   long __pyx_v_n_trees;
   long __pyx_v_mtry;
   long __pyx_v_node_size;
+  bool __pyx_v_fit_oob;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("train (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_x_train,&__pyx_n_s_z_basis,&__pyx_n_s_n_trees,&__pyx_n_s_mtry,&__pyx_n_s_node_size,0};
-    PyObject* values[5] = {0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_x_train,&__pyx_n_s_z_basis,&__pyx_n_s_n_trees,&__pyx_n_s_mtry,&__pyx_n_s_node_size,&__pyx_n_s_fit_oob,0};
+    PyObject* values[6] = {0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -1961,56 +1987,87 @@ static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_7train(PyObject
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_z_basis)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("train", 1, 5, 5, 1); __PYX_ERR(1, 40, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("train", 0, 5, 6, 1); __PYX_ERR(1, 42, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_n_trees)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("train", 1, 5, 5, 2); __PYX_ERR(1, 40, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("train", 0, 5, 6, 2); __PYX_ERR(1, 42, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_mtry)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("train", 1, 5, 5, 3); __PYX_ERR(1, 40, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("train", 0, 5, 6, 3); __PYX_ERR(1, 42, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_node_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("train", 1, 5, 5, 4); __PYX_ERR(1, 40, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("train", 0, 5, 6, 4); __PYX_ERR(1, 42, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (kw_args > 0) {
+          PyObject* value = PyDict_GetItem(__pyx_kwds, __pyx_n_s_fit_oob);
+          if (value) { values[5] = value; kw_args--; }
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "train") < 0)) __PYX_ERR(1, 40, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "train") < 0)) __PYX_ERR(1, 42, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
-      goto __pyx_L5_argtuple_error;
     } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
     }
     __pyx_v_x_train = ((PyArrayObject *)values[0]);
     __pyx_v_z_basis = ((PyArrayObject *)values[1]);
-    __pyx_v_n_trees = __Pyx_PyInt_As_long(values[2]); if (unlikely((__pyx_v_n_trees == (long)-1) && PyErr_Occurred())) __PYX_ERR(1, 41, __pyx_L3_error)
-    __pyx_v_mtry = __Pyx_PyInt_As_long(values[3]); if (unlikely((__pyx_v_mtry == (long)-1) && PyErr_Occurred())) __PYX_ERR(1, 42, __pyx_L3_error)
-    __pyx_v_node_size = __Pyx_PyInt_As_long(values[4]); if (unlikely((__pyx_v_node_size == (long)-1) && PyErr_Occurred())) __PYX_ERR(1, 42, __pyx_L3_error)
+    __pyx_v_n_trees = __Pyx_PyInt_As_long(values[2]); if (unlikely((__pyx_v_n_trees == (long)-1) && PyErr_Occurred())) __PYX_ERR(1, 43, __pyx_L3_error)
+    __pyx_v_mtry = __Pyx_PyInt_As_long(values[3]); if (unlikely((__pyx_v_mtry == (long)-1) && PyErr_Occurred())) __PYX_ERR(1, 44, __pyx_L3_error)
+    __pyx_v_node_size = __Pyx_PyInt_As_long(values[4]); if (unlikely((__pyx_v_node_size == (long)-1) && PyErr_Occurred())) __PYX_ERR(1, 44, __pyx_L3_error)
+    if (values[5]) {
+      __pyx_v_fit_oob = __Pyx_PyObject_IsTrue(values[5]); if (unlikely((__pyx_v_fit_oob == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(1, 44, __pyx_L3_error)
+    } else {
+
+      /* "rfcde/ForestWrapper.pyx":44
+ *     def train(self, np.ndarray[double, ndim=2, mode="fortran"] x_train,
+ *               np.ndarray[double, ndim=2, mode="fortran"] z_basis, long n_trees,
+ *               long mtry, long node_size, bool fit_oob=False):             # <<<<<<<<<<<<<<
+ *         """Trains RFCDE on training data.
+ * 
+ */
+      __pyx_v_fit_oob = ((bool)0);
+    }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("train", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 40, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("train", 0, 5, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 42, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("rfcde.ForestWrapper.ForestWrapper.train", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x_train), __pyx_ptype_5numpy_ndarray, 1, "x_train", 0))) __PYX_ERR(1, 40, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_z_basis), __pyx_ptype_5numpy_ndarray, 1, "z_basis", 0))) __PYX_ERR(1, 41, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self), __pyx_v_x_train, __pyx_v_z_basis, __pyx_v_n_trees, __pyx_v_mtry, __pyx_v_node_size);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x_train), __pyx_ptype_5numpy_ndarray, 1, "x_train", 0))) __PYX_ERR(1, 42, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_z_basis), __pyx_ptype_5numpy_ndarray, 1, "z_basis", 0))) __PYX_ERR(1, 43, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self), __pyx_v_x_train, __pyx_v_z_basis, __pyx_v_n_trees, __pyx_v_mtry, __pyx_v_node_size, __pyx_v_fit_oob);
+
+  /* "rfcde/ForestWrapper.pyx":42
+ *     @cython.boundscheck(False)
+ *     @cython.wraparound(False)
+ *     def train(self, np.ndarray[double, ndim=2, mode="fortran"] x_train,             # <<<<<<<<<<<<<<
+ *               np.ndarray[double, ndim=2, mode="fortran"] z_basis, long n_trees,
+ *               long mtry, long node_size, bool fit_oob=False):
+ */
 
   /* function exit code */
   goto __pyx_L0;
@@ -2021,7 +2078,7 @@ static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_7train(PyObject
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, PyArrayObject *__pyx_v_x_train, PyArrayObject *__pyx_v_z_basis, long __pyx_v_n_trees, long __pyx_v_mtry, long __pyx_v_node_size) {
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, PyArrayObject *__pyx_v_x_train, PyArrayObject *__pyx_v_z_basis, long __pyx_v_n_trees, long __pyx_v_mtry, long __pyx_v_node_size, bool __pyx_v_fit_oob) {
   int __pyx_v_n_train;
   int __pyx_v_n_var;
   int __pyx_v_n_basis;
@@ -2049,17 +2106,17 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct _
   __pyx_pybuffernd_z_basis.rcbuffer = &__pyx_pybuffer_z_basis;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_train.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_train, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_F_CONTIGUOUS, 2, 0, __pyx_stack) == -1)) __PYX_ERR(1, 40, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_train.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_train, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_F_CONTIGUOUS, 2, 0, __pyx_stack) == -1)) __PYX_ERR(1, 42, __pyx_L1_error)
   }
   __pyx_pybuffernd_x_train.diminfo[0].strides = __pyx_pybuffernd_x_train.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x_train.diminfo[0].shape = __pyx_pybuffernd_x_train.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_x_train.diminfo[1].strides = __pyx_pybuffernd_x_train.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_x_train.diminfo[1].shape = __pyx_pybuffernd_x_train.rcbuffer->pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_z_basis.rcbuffer->pybuffer, (PyObject*)__pyx_v_z_basis, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_F_CONTIGUOUS, 2, 0, __pyx_stack) == -1)) __PYX_ERR(1, 40, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_z_basis.rcbuffer->pybuffer, (PyObject*)__pyx_v_z_basis, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_F_CONTIGUOUS, 2, 0, __pyx_stack) == -1)) __PYX_ERR(1, 42, __pyx_L1_error)
   }
   __pyx_pybuffernd_z_basis.diminfo[0].strides = __pyx_pybuffernd_z_basis.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_z_basis.diminfo[0].shape = __pyx_pybuffernd_z_basis.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_z_basis.diminfo[1].strides = __pyx_pybuffernd_z_basis.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_z_basis.diminfo[1].shape = __pyx_pybuffernd_z_basis.rcbuffer->pybuffer.shape[1];
 
-  /* "rfcde/ForestWrapper.pyx":61
- *             The minimum number of observations in each leaf node.
+  /* "rfcde/ForestWrapper.pyx":65
+ *             Whether to fit out-of-bag samples. Defaults to False.
  *         """
  *         self.n_train = x_train.shape[0]             # <<<<<<<<<<<<<<
  * 
@@ -2067,7 +2124,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct _
  */
   __pyx_v_self->n_train = (__pyx_v_x_train->dimensions[0]);
 
-  /* "rfcde/ForestWrapper.pyx":63
+  /* "rfcde/ForestWrapper.pyx":67
  *         self.n_train = x_train.shape[0]
  * 
  *         cdef int n_train = x_train.shape[0]             # <<<<<<<<<<<<<<
@@ -2076,7 +2133,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct _
  */
   __pyx_v_n_train = (__pyx_v_x_train->dimensions[0]);
 
-  /* "rfcde/ForestWrapper.pyx":64
+  /* "rfcde/ForestWrapper.pyx":68
  * 
  *         cdef int n_train = x_train.shape[0]
  *         cdef int n_var = x_train.shape[1]             # <<<<<<<<<<<<<<
@@ -2085,7 +2142,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct _
  */
   __pyx_v_n_var = (__pyx_v_x_train->dimensions[1]);
 
-  /* "rfcde/ForestWrapper.pyx":65
+  /* "rfcde/ForestWrapper.pyx":69
  *         cdef int n_train = x_train.shape[0]
  *         cdef int n_var = x_train.shape[1]
  *         cdef int n_basis = z_basis.shape[1]             # <<<<<<<<<<<<<<
@@ -2094,7 +2151,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct _
  */
   __pyx_v_n_basis = (__pyx_v_z_basis->dimensions[1]);
 
-  /* "rfcde/ForestWrapper.pyx":66
+  /* "rfcde/ForestWrapper.pyx":70
  *         cdef int n_var = x_train.shape[1]
  *         cdef int n_basis = z_basis.shape[1]
  *         cdef int n_trees_i = n_trees;             # <<<<<<<<<<<<<<
@@ -2103,7 +2160,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct _
  */
   __pyx_v_n_trees_i = __pyx_v_n_trees;
 
-  /* "rfcde/ForestWrapper.pyx":67
+  /* "rfcde/ForestWrapper.pyx":71
  *         cdef int n_basis = z_basis.shape[1]
  *         cdef int n_trees_i = n_trees;
  *         cdef int mtry_i = mtry;             # <<<<<<<<<<<<<<
@@ -2112,7 +2169,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct _
  */
   __pyx_v_mtry_i = __pyx_v_mtry;
 
-  /* "rfcde/ForestWrapper.pyx":68
+  /* "rfcde/ForestWrapper.pyx":72
  *         cdef int n_trees_i = n_trees;
  *         cdef int mtry_i = mtry;
  *         cdef int node_size_i = node_size;             # <<<<<<<<<<<<<<
@@ -2121,33 +2178,33 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct _
  */
   __pyx_v_node_size_i = __pyx_v_node_size;
 
-  /* "rfcde/ForestWrapper.pyx":71
+  /* "rfcde/ForestWrapper.pyx":75
  * 
  *         # Pass in pointers of numpy matrices/arrays
  *         self.Cpp_Class.train(&x_train[0,0], &z_basis[0,0], n_train,             # <<<<<<<<<<<<<<
  *                              n_var, n_basis, n_trees_i, mtry_i,
- *                              node_size_i)
+ *                              node_size_i, fit_oob)
  */
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
 
-  /* "rfcde/ForestWrapper.pyx":73
+  /* "rfcde/ForestWrapper.pyx":77
  *         self.Cpp_Class.train(&x_train[0,0], &z_basis[0,0], n_train,
  *                              n_var, n_basis, n_trees_i, mtry_i,
- *                              node_size_i)             # <<<<<<<<<<<<<<
+ *                              node_size_i, fit_oob)             # <<<<<<<<<<<<<<
  * 
  *     @cython.boundscheck(False)
  */
-  __pyx_v_self->Cpp_Class->train((&(*__Pyx_BufPtrFortranContig2d(double *, __pyx_pybuffernd_x_train.rcbuffer->pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_x_train.diminfo[0].strides, __pyx_t_2, __pyx_pybuffernd_x_train.diminfo[1].strides))), (&(*__Pyx_BufPtrFortranContig2d(double *, __pyx_pybuffernd_z_basis.rcbuffer->pybuffer.buf, __pyx_t_3, __pyx_pybuffernd_z_basis.diminfo[0].strides, __pyx_t_4, __pyx_pybuffernd_z_basis.diminfo[1].strides))), __pyx_v_n_train, __pyx_v_n_var, __pyx_v_n_basis, __pyx_v_n_trees_i, __pyx_v_mtry_i, __pyx_v_node_size_i);
+  __pyx_v_self->Cpp_Class->train((&(*__Pyx_BufPtrFortranContig2d(double *, __pyx_pybuffernd_x_train.rcbuffer->pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_x_train.diminfo[0].strides, __pyx_t_2, __pyx_pybuffernd_x_train.diminfo[1].strides))), (&(*__Pyx_BufPtrFortranContig2d(double *, __pyx_pybuffernd_z_basis.rcbuffer->pybuffer.buf, __pyx_t_3, __pyx_pybuffernd_z_basis.diminfo[0].strides, __pyx_t_4, __pyx_pybuffernd_z_basis.diminfo[1].strides))), __pyx_v_n_train, __pyx_v_n_var, __pyx_v_n_basis, __pyx_v_n_trees_i, __pyx_v_mtry_i, __pyx_v_node_size_i, __pyx_v_fit_oob);
 
-  /* "rfcde/ForestWrapper.pyx":40
+  /* "rfcde/ForestWrapper.pyx":42
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     def train(self, np.ndarray[double, ndim=2, mode="fortran"] x_train,             # <<<<<<<<<<<<<<
  *               np.ndarray[double, ndim=2, mode="fortran"] z_basis, long n_trees,
- *               long mtry, long node_size):
+ *               long mtry, long node_size, bool fit_oob=False):
  */
 
   /* function exit code */
@@ -2173,7 +2230,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_6train(struct _
   return __pyx_r;
 }
 
-/* "rfcde/ForestWrapper.pyx":77
+/* "rfcde/ForestWrapper.pyx":81
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     def fill_weights(self, np.ndarray[double, ndim=1, mode="c"] x_test,             # <<<<<<<<<<<<<<
@@ -2213,11 +2270,11 @@ static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_9fill_weights(P
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_wt_buf)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("fill_weights", 1, 2, 2, 1); __PYX_ERR(1, 77, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("fill_weights", 1, 2, 2, 1); __PYX_ERR(1, 81, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "fill_weights") < 0)) __PYX_ERR(1, 77, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "fill_weights") < 0)) __PYX_ERR(1, 81, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2230,14 +2287,14 @@ static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_9fill_weights(P
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("fill_weights", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 77, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("fill_weights", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 81, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("rfcde.ForestWrapper.ForestWrapper.fill_weights", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x_test), __pyx_ptype_5numpy_ndarray, 1, "x_test", 0))) __PYX_ERR(1, 77, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_wt_buf), __pyx_ptype_5numpy_ndarray, 1, "wt_buf", 0))) __PYX_ERR(1, 78, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x_test), __pyx_ptype_5numpy_ndarray, 1, "x_test", 0))) __PYX_ERR(1, 81, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_wt_buf), __pyx_ptype_5numpy_ndarray, 1, "wt_buf", 0))) __PYX_ERR(1, 82, __pyx_L1_error)
   __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_8fill_weights(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self), __pyx_v_x_test, __pyx_v_wt_buf);
 
   /* function exit code */
@@ -2269,16 +2326,16 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_8fill_weights(s
   __pyx_pybuffernd_wt_buf.rcbuffer = &__pyx_pybuffer_wt_buf;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_test.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_test, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 1, 0, __pyx_stack) == -1)) __PYX_ERR(1, 77, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_test.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_test, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 1, 0, __pyx_stack) == -1)) __PYX_ERR(1, 81, __pyx_L1_error)
   }
   __pyx_pybuffernd_x_test.diminfo[0].strides = __pyx_pybuffernd_x_test.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x_test.diminfo[0].shape = __pyx_pybuffernd_x_test.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_wt_buf.rcbuffer->pybuffer, (PyObject*)__pyx_v_wt_buf, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 1, 0, __pyx_stack) == -1)) __PYX_ERR(1, 77, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_wt_buf.rcbuffer->pybuffer, (PyObject*)__pyx_v_wt_buf, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 1, 0, __pyx_stack) == -1)) __PYX_ERR(1, 81, __pyx_L1_error)
   }
   __pyx_pybuffernd_wt_buf.diminfo[0].strides = __pyx_pybuffernd_wt_buf.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_wt_buf.diminfo[0].shape = __pyx_pybuffernd_wt_buf.rcbuffer->pybuffer.shape[0];
 
-  /* "rfcde/ForestWrapper.pyx":96
+  /* "rfcde/ForestWrapper.pyx":100
  * 
  *         """
  *         self.Cpp_Class.fill_weights(&x_test[0], &wt_buf[0])             # <<<<<<<<<<<<<<
@@ -2289,7 +2346,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_8fill_weights(s
   __pyx_t_2 = 0;
   __pyx_v_self->Cpp_Class->fill_weights((&(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_x_test.rcbuffer->pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_x_test.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig1d(long *, __pyx_pybuffernd_wt_buf.rcbuffer->pybuffer.buf, __pyx_t_2, __pyx_pybuffernd_wt_buf.diminfo[0].strides))));
 
-  /* "rfcde/ForestWrapper.pyx":77
+  /* "rfcde/ForestWrapper.pyx":81
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     def fill_weights(self, np.ndarray[double, ndim=1, mode="c"] x_test,             # <<<<<<<<<<<<<<
@@ -2320,7 +2377,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_8fill_weights(s
   return __pyx_r;
 }
 
-/* "rfcde/ForestWrapper.pyx":98
+/* "rfcde/ForestWrapper.pyx":102
  *         self.Cpp_Class.fill_weights(&x_test[0], &wt_buf[0])
  * 
  *     def weights(self, np.ndarray[double, ndim=1, mode="c"] x_test):             # <<<<<<<<<<<<<<
@@ -2334,7 +2391,7 @@ static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_11weights(PyObj
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("weights (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x_test), __pyx_ptype_5numpy_ndarray, 1, "x_test", 0))) __PYX_ERR(1, 98, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x_test), __pyx_ptype_5numpy_ndarray, 1, "x_test", 0))) __PYX_ERR(1, 102, __pyx_L1_error)
   __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_10weights(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self), ((PyArrayObject *)__pyx_v_x_test));
 
   /* function exit code */
@@ -2364,33 +2421,33 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_10weights(struc
   __pyx_pybuffernd_x_test.rcbuffer = &__pyx_pybuffer_x_test;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_test.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_test, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 1, 0, __pyx_stack) == -1)) __PYX_ERR(1, 98, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_test.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_test, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 1, 0, __pyx_stack) == -1)) __PYX_ERR(1, 102, __pyx_L1_error)
   }
   __pyx_pybuffernd_x_test.diminfo[0].strides = __pyx_pybuffernd_x_test.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x_test.diminfo[0].shape = __pyx_pybuffernd_x_test.rcbuffer->pybuffer.shape[0];
 
-  /* "rfcde/ForestWrapper.pyx":99
+  /* "rfcde/ForestWrapper.pyx":103
  * 
  *     def weights(self, np.ndarray[double, ndim=1, mode="c"] x_test):
  *         wt_buf = np.zeros(self.n_train, dtype=int)             # <<<<<<<<<<<<<<
  *         self.fill_weights(x_test, wt_buf)
  *         return wt_buf
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 99, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 99, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->n_train); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 99, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->n_train); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 99, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 99, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, ((PyObject *)(&PyInt_Type))) < 0) __PYX_ERR(1, 99, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 99, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, ((PyObject *)(&PyInt_Type))) < 0) __PYX_ERR(1, 103, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2398,13 +2455,14 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_10weights(struc
   __pyx_v_wt_buf = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "rfcde/ForestWrapper.pyx":100
+  /* "rfcde/ForestWrapper.pyx":104
  *     def weights(self, np.ndarray[double, ndim=1, mode="c"] x_test):
  *         wt_buf = np.zeros(self.n_train, dtype=int)
  *         self.fill_weights(x_test, wt_buf)             # <<<<<<<<<<<<<<
  *         return wt_buf
+ * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_fill_weights); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 100, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_fill_weights); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 104, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_3 = NULL;
   __pyx_t_5 = 0;
@@ -2421,7 +2479,7 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_10weights(struc
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_1)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, ((PyObject *)__pyx_v_x_test), __pyx_v_wt_buf};
-    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 100, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 104, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_4);
   } else
@@ -2429,13 +2487,13 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_10weights(struc
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, ((PyObject *)__pyx_v_x_test), __pyx_v_wt_buf};
-    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 100, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 104, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_4);
   } else
   #endif
   {
-    __pyx_t_2 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 100, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -2446,24 +2504,26 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_10weights(struc
     __Pyx_INCREF(__pyx_v_wt_buf);
     __Pyx_GIVEREF(__pyx_v_wt_buf);
     PyTuple_SET_ITEM(__pyx_t_2, 1+__pyx_t_5, __pyx_v_wt_buf);
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 100, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "rfcde/ForestWrapper.pyx":101
+  /* "rfcde/ForestWrapper.pyx":105
  *         wt_buf = np.zeros(self.n_train, dtype=int)
  *         self.fill_weights(x_test, wt_buf)
  *         return wt_buf             # <<<<<<<<<<<<<<
+ * 
+ * 
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_wt_buf);
   __pyx_r = __pyx_v_wt_buf;
   goto __pyx_L0;
 
-  /* "rfcde/ForestWrapper.pyx":98
+  /* "rfcde/ForestWrapper.pyx":102
  *         self.Cpp_Class.fill_weights(&x_test[0], &wt_buf[0])
  * 
  *     def weights(self, np.ndarray[double, ndim=1, mode="c"] x_test):             # <<<<<<<<<<<<<<
@@ -2495,6 +2555,257 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_10weights(struc
   return __pyx_r;
 }
 
+/* "rfcde/ForestWrapper.pyx":108
+ * 
+ * 
+ *     def fill_oob_weights(self, np.ndarray[long, ndim=2, mode="fortran"] wt_mat):             # <<<<<<<<<<<<<<
+ *         self.Cpp_Class.fill_oob_weights(&wt_mat[0,0])
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_13fill_oob_weights(PyObject *__pyx_v_self, PyObject *__pyx_v_wt_mat); /*proto*/
+static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_13fill_oob_weights(PyObject *__pyx_v_self, PyObject *__pyx_v_wt_mat) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("fill_oob_weights (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_wt_mat), __pyx_ptype_5numpy_ndarray, 1, "wt_mat", 0))) __PYX_ERR(1, 108, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_12fill_oob_weights(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self), ((PyArrayObject *)__pyx_v_wt_mat));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_12fill_oob_weights(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, PyArrayObject *__pyx_v_wt_mat) {
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_wt_mat;
+  __Pyx_Buffer __pyx_pybuffer_wt_mat;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  Py_ssize_t __pyx_t_1;
+  Py_ssize_t __pyx_t_2;
+  int __pyx_t_3;
+  __Pyx_RefNannySetupContext("fill_oob_weights", 0);
+  __pyx_pybuffer_wt_mat.pybuffer.buf = NULL;
+  __pyx_pybuffer_wt_mat.refcount = 0;
+  __pyx_pybuffernd_wt_mat.data = NULL;
+  __pyx_pybuffernd_wt_mat.rcbuffer = &__pyx_pybuffer_wt_mat;
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_wt_mat.rcbuffer->pybuffer, (PyObject*)__pyx_v_wt_mat, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_F_CONTIGUOUS, 2, 0, __pyx_stack) == -1)) __PYX_ERR(1, 108, __pyx_L1_error)
+  }
+  __pyx_pybuffernd_wt_mat.diminfo[0].strides = __pyx_pybuffernd_wt_mat.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_wt_mat.diminfo[0].shape = __pyx_pybuffernd_wt_mat.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_wt_mat.diminfo[1].strides = __pyx_pybuffernd_wt_mat.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_wt_mat.diminfo[1].shape = __pyx_pybuffernd_wt_mat.rcbuffer->pybuffer.shape[1];
+
+  /* "rfcde/ForestWrapper.pyx":109
+ * 
+ *     def fill_oob_weights(self, np.ndarray[long, ndim=2, mode="fortran"] wt_mat):
+ *         self.Cpp_Class.fill_oob_weights(&wt_mat[0,0])             # <<<<<<<<<<<<<<
+ * 
+ *     def oob_weights(self):
+ */
+  __pyx_t_1 = 0;
+  __pyx_t_2 = 0;
+  __pyx_t_3 = -1;
+  if (__pyx_t_1 < 0) {
+    __pyx_t_1 += __pyx_pybuffernd_wt_mat.diminfo[0].shape;
+    if (unlikely(__pyx_t_1 < 0)) __pyx_t_3 = 0;
+  } else if (unlikely(__pyx_t_1 >= __pyx_pybuffernd_wt_mat.diminfo[0].shape)) __pyx_t_3 = 0;
+  if (__pyx_t_2 < 0) {
+    __pyx_t_2 += __pyx_pybuffernd_wt_mat.diminfo[1].shape;
+    if (unlikely(__pyx_t_2 < 0)) __pyx_t_3 = 1;
+  } else if (unlikely(__pyx_t_2 >= __pyx_pybuffernd_wt_mat.diminfo[1].shape)) __pyx_t_3 = 1;
+  if (unlikely(__pyx_t_3 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_3);
+    __PYX_ERR(1, 109, __pyx_L1_error)
+  }
+  __pyx_v_self->Cpp_Class->fill_oob_weights((&(*__Pyx_BufPtrFortranContig2d(long *, __pyx_pybuffernd_wt_mat.rcbuffer->pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_wt_mat.diminfo[0].strides, __pyx_t_2, __pyx_pybuffernd_wt_mat.diminfo[1].strides))));
+
+  /* "rfcde/ForestWrapper.pyx":108
+ * 
+ * 
+ *     def fill_oob_weights(self, np.ndarray[long, ndim=2, mode="fortran"] wt_mat):             # <<<<<<<<<<<<<<
+ *         self.Cpp_Class.fill_oob_weights(&wt_mat[0,0])
+ * 
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    __Pyx_ErrFetch(&__pyx_type, &__pyx_value, &__pyx_tb);
+    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_wt_mat.rcbuffer->pybuffer);
+  __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
+  __Pyx_AddTraceback("rfcde.ForestWrapper.ForestWrapper.fill_oob_weights", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  goto __pyx_L2;
+  __pyx_L0:;
+  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_wt_mat.rcbuffer->pybuffer);
+  __pyx_L2:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "rfcde/ForestWrapper.pyx":111
+ *         self.Cpp_Class.fill_oob_weights(&wt_mat[0,0])
+ * 
+ *     def oob_weights(self):             # <<<<<<<<<<<<<<
+ *         wt_mat = np.zeros(self.n_train, self.n_train, dtype=int, order="F")
+ *         self.fill_oob_weights(wt_mat)
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_15oob_weights(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_15oob_weights(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("oob_weights (wrapper)", 0);
+  __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_14oob_weights(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_14oob_weights(struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self) {
+  PyObject *__pyx_v_wt_mat = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  __Pyx_RefNannySetupContext("oob_weights", 0);
+
+  /* "rfcde/ForestWrapper.pyx":112
+ * 
+ *     def oob_weights(self):
+ *         wt_mat = np.zeros(self.n_train, self.n_train, dtype=int, order="F")             # <<<<<<<<<<<<<<
+ *         self.fill_oob_weights(wt_mat)
+ *         return wt_mat
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 112, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 112, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->n_train); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 112, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->n_train); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 112, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 112, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_3);
+  __pyx_t_1 = 0;
+  __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 112, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, ((PyObject *)(&PyInt_Type))) < 0) __PYX_ERR(1, 112, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_order, __pyx_n_s_F) < 0) __PYX_ERR(1, 112, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 112, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_wt_mat = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "rfcde/ForestWrapper.pyx":113
+ *     def oob_weights(self):
+ *         wt_mat = np.zeros(self.n_train, self.n_train, dtype=int, order="F")
+ *         self.fill_oob_weights(wt_mat)             # <<<<<<<<<<<<<<
+ *         return wt_mat
+ */
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_fill_oob_weights); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 113, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  if (!__pyx_t_4) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_wt_mat); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 113, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  } else {
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_3)) {
+      PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_v_wt_mat};
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 113, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
+      PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_v_wt_mat};
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 113, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+    } else
+    #endif
+    {
+      __pyx_t_2 = PyTuple_New(1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 113, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4); __pyx_t_4 = NULL;
+      __Pyx_INCREF(__pyx_v_wt_mat);
+      __Pyx_GIVEREF(__pyx_v_wt_mat);
+      PyTuple_SET_ITEM(__pyx_t_2, 0+1, __pyx_v_wt_mat);
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 113, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    }
+  }
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "rfcde/ForestWrapper.pyx":114
+ *         wt_mat = np.zeros(self.n_train, self.n_train, dtype=int, order="F")
+ *         self.fill_oob_weights(wt_mat)
+ *         return wt_mat             # <<<<<<<<<<<<<<
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_wt_mat);
+  __pyx_r = __pyx_v_wt_mat;
+  goto __pyx_L0;
+
+  /* "rfcde/ForestWrapper.pyx":111
+ *         self.Cpp_Class.fill_oob_weights(&wt_mat[0,0])
+ * 
+ *     def oob_weights(self):             # <<<<<<<<<<<<<<
+ *         wt_mat = np.zeros(self.n_train, self.n_train, dtype=int, order="F")
+ *         self.fill_oob_weights(wt_mat)
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("rfcde.ForestWrapper.ForestWrapper.oob_weights", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_wt_mat);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
 /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")
@@ -2502,19 +2813,19 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_10weights(struc
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_13__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_13__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_17__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_17__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_12__reduce_cython__(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_16__reduce_cython__(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_12__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self) {
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_16__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2556,19 +2867,19 @@ static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_12__reduce_cyth
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_15__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_15__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_19__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_19__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_14__setstate_cython__(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_18__setstate_cython__(((struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_14__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5rfcde_13ForestWrapper_13ForestWrapper_18__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5rfcde_13ForestWrapper_ForestWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5220,8 +5531,10 @@ static PyMethodDef __pyx_methods_5rfcde_13ForestWrapper_ForestWrapper[] = {
   {"train", (PyCFunction)__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_7train, METH_VARARGS|METH_KEYWORDS, __pyx_doc_5rfcde_13ForestWrapper_13ForestWrapper_6train},
   {"fill_weights", (PyCFunction)__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_9fill_weights, METH_VARARGS|METH_KEYWORDS, __pyx_doc_5rfcde_13ForestWrapper_13ForestWrapper_8fill_weights},
   {"weights", (PyCFunction)__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_11weights, METH_O, 0},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_13__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_15__setstate_cython__, METH_O, 0},
+  {"fill_oob_weights", (PyCFunction)__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_13fill_oob_weights, METH_O, 0},
+  {"oob_weights", (PyCFunction)__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_15oob_weights, METH_NOARGS, 0},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_17__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_5rfcde_13ForestWrapper_13ForestWrapper_19__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -5320,6 +5633,7 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
+  {&__pyx_n_s_F, __pyx_k_F, sizeof(__pyx_k_F), 0, 0, 1, 1},
   {&__pyx_kp_u_Format_string_allocated_too_shor, __pyx_k_Format_string_allocated_too_shor, sizeof(__pyx_k_Format_string_allocated_too_shor), 0, 1, 0, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor_2, __pyx_k_Format_string_allocated_too_shor_2, sizeof(__pyx_k_Format_string_allocated_too_shor_2), 0, 1, 0, 0},
   {&__pyx_n_s_ImportError, __pyx_k_ImportError, sizeof(__pyx_k_ImportError), 0, 0, 1, 1},
@@ -5329,7 +5643,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_dtype, __pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 0, 1, 1},
+  {&__pyx_n_s_fill_oob_weights, __pyx_k_fill_oob_weights, sizeof(__pyx_k_fill_oob_weights), 0, 0, 1, 1},
   {&__pyx_n_s_fill_weights, __pyx_k_fill_weights, sizeof(__pyx_k_fill_weights), 0, 0, 1, 1},
+  {&__pyx_n_s_fit_oob, __pyx_k_fit_oob, sizeof(__pyx_k_fit_oob), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
@@ -5344,6 +5660,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_kp_s_numpy_core_multiarray_failed_to, __pyx_k_numpy_core_multiarray_failed_to, sizeof(__pyx_k_numpy_core_multiarray_failed_to), 0, 0, 1, 0},
   {&__pyx_kp_s_numpy_core_umath_failed_to_impor, __pyx_k_numpy_core_umath_failed_to_impor, sizeof(__pyx_k_numpy_core_umath_failed_to_impor), 0, 0, 1, 0},
+  {&__pyx_n_s_order, __pyx_k_order, sizeof(__pyx_k_order), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
@@ -5640,10 +5957,10 @@ static int __pyx_pymod_exec_ForestWrapper(PyObject *__pyx_pyinit_module)
   /*--- Variable export code ---*/
   /*--- Function export code ---*/
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_5rfcde_13ForestWrapper_ForestWrapper) < 0) __PYX_ERR(1, 16, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5rfcde_13ForestWrapper_ForestWrapper) < 0) __PYX_ERR(1, 18, __pyx_L1_error)
   __pyx_type_5rfcde_13ForestWrapper_ForestWrapper.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "ForestWrapper", (PyObject *)&__pyx_type_5rfcde_13ForestWrapper_ForestWrapper) < 0) __PYX_ERR(1, 16, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5rfcde_13ForestWrapper_ForestWrapper) < 0) __PYX_ERR(1, 16, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "ForestWrapper", (PyObject *)&__pyx_type_5rfcde_13ForestWrapper_ForestWrapper) < 0) __PYX_ERR(1, 18, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5rfcde_13ForestWrapper_ForestWrapper) < 0) __PYX_ERR(1, 18, __pyx_L1_error)
   __pyx_ptype_5rfcde_13ForestWrapper_ForestWrapper = &__pyx_type_5rfcde_13ForestWrapper_ForestWrapper;
   /*--- Type import code ---*/
   __pyx_ptype_7cpython_4type_type = __Pyx_ImportType(__Pyx_BUILTIN_MODULE_NAME, "type", 
@@ -5665,22 +5982,22 @@ static int __pyx_pymod_exec_ForestWrapper(PyObject *__pyx_pyinit_module)
   if (__Pyx_patch_abc() < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   #endif
 
-  /* "rfcde/ForestWrapper.pyx":3
- * cimport cython
+  /* "rfcde/ForestWrapper.pyx":4
+ * from libcpp cimport bool
  * 
  * import numpy as np             # <<<<<<<<<<<<<<
  * cimport numpy as np
  * 
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(1, 4, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "rfcde/ForestWrapper.pyx":1
  * cimport cython             # <<<<<<<<<<<<<<
+ * from libcpp cimport bool
  * 
- * import numpy as np
  */
   __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -6714,6 +7031,72 @@ static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, P
     } else {
         return (*((__Pyx_PyCFunctionFast)meth)) (self, args, nargs);
     }
+}
+#endif
+
+/* BufferIndexError */
+    static void __Pyx_RaiseBufferIndexError(int axis) {
+  PyErr_Format(PyExc_IndexError,
+     "Out of bounds on buffer access (axis %d)", axis);
+}
+
+/* PyObjectCallMethO */
+    #if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg) {
+    PyObject *self, *result;
+    PyCFunction cfunc;
+    cfunc = PyCFunction_GET_FUNCTION(func);
+    self = PyCFunction_GET_SELF(func);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = cfunc(self, arg);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
+/* PyObjectCallOneArg */
+    #if CYTHON_COMPILING_IN_CPYTHON
+static PyObject* __Pyx__PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+    PyObject *result;
+    PyObject *args = PyTuple_New(1);
+    if (unlikely(!args)) return NULL;
+    Py_INCREF(arg);
+    PyTuple_SET_ITEM(args, 0, arg);
+    result = __Pyx_PyObject_Call(func, args, NULL);
+    Py_DECREF(args);
+    return result;
+}
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+#if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(func)) {
+        return __Pyx_PyFunction_FastCall(func, &arg, 1);
+    }
+#endif
+    if (likely(PyCFunction_Check(func))) {
+        if (likely(PyCFunction_GET_FLAGS(func) & METH_O)) {
+            return __Pyx_PyObject_CallMethO(func, arg);
+#if CYTHON_FAST_PYCCALL
+        } else if (PyCFunction_GET_FLAGS(func) & METH_FASTCALL) {
+            return __Pyx_PyCFunction_FastCall(func, &arg, 1);
+#endif
+        }
+    }
+    return __Pyx__PyObject_CallOneArg(func, arg);
+}
+#else
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+    PyObject *result;
+    PyObject *args = PyTuple_Pack(1, arg);
+    if (unlikely(!args)) return NULL;
+    result = __Pyx_PyObject_Call(func, args, NULL);
+    Py_DECREF(args);
+    return result;
 }
 #endif
 

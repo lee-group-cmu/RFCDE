@@ -8,11 +8,14 @@
 #' @param node_size the minimum number of observations in a leaf node.
 #' @param n_basis the number of basis functions used in split density
 #'   estimates.
-#' @param basis_system the system of basis functions to use;
-#'   currently "cosine" and "Haar" are supported.
+#' @param basis_system the system of basis functions to use; currently
+#'   "cosine" and "Haar" are supported.
+#' @param fit_oob whether to fit out-of-bag samples or not. Out-of-bag
+#'   samples increase the computation time but allows for estimation
+#'   of the prediction loss. Defaults to FALSE.
 #' @export
 RFCDE <- function(x_train, z_train, n_trees, mtry, node_size, n_basis,
-                      basis_system = "cosine") {
+                      basis_system = "cosine", fit_oob=FALSE) {
   if (!is.matrix(x_train)) { x_train <- as.matrix(x_train) }
   if (!is.matrix(z_train)) { z_train <- as.matrix(z_train) }
   mtry <- min(mtry, ncol(x_train))
@@ -26,9 +29,11 @@ RFCDE <- function(x_train, z_train, n_trees, mtry, node_size, n_basis,
   z_basis <- basis_fn(box(z_train, z_min, z_max), n_basis)
 
   forest <- methods::new(ForestRcpp)
-  forest$train(x_train, z_basis, n_trees, mtry, node_size)
+  forest$train(x_train, z_basis, n_trees, mtry, node_size, fit_oob)
 
-  return(structure(list(z_train = z_train, rcpp = forest), class = "RFCDE"))
+  return(structure(list(z_train = z_train,
+                        fit_oob = fit_oob,
+                        rcpp = forest), class = "RFCDE"))
 }
 
 #' Obtains weights from RFCDE object.
