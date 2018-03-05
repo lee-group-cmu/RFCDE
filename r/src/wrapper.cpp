@@ -23,19 +23,22 @@ private:
   Forest obj;
 public:
   void train(NumericMatrix x_train, NumericMatrix z_basis, int n_trees,
-             int mtry, int node_size) {
-
+             int mtry, int node_size, bool fit_oob) {
     int n_train = x_train.nrow();
     int n_var = x_train.ncol();
     int n_basis = z_basis.ncol();
 
     obj.train(&x_train(0,0), &z_basis(0,0), n_train, n_var, n_basis,
-              n_trees, mtry, node_size);
-  }
+              n_trees, mtry, node_size, fit_oob);
+  };
 
   void fill_weights(Rcpp::NumericVector x_test, Rcpp::IntegerVector weights) {
     obj.fill_weights(&x_test(0), &weights(0));
-  }
+  };
+
+  void fill_oob_weights(Rcpp::IntegerMatrix weights) {
+    obj.fill_oob_weights(&weights(0,0));
+  };
 };
 
 RCPP_MODULE(RFCDEModule) {
@@ -43,5 +46,6 @@ RCPP_MODULE(RFCDEModule) {
     .constructor()
     .method("train", &ForestRcpp::train)
     .method("fill_weights", &ForestRcpp::fill_weights)
+    .method("fill_oob_weights", &ForestRcpp::fill_oob_weights)
     ;
 }

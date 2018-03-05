@@ -6,8 +6,8 @@
 
 void Tree::train(double* x_train, double* z_basis,
                  const std::vector<int>& weights,
-                 int n_train,
-                 int n_var, int n_basis, int mtry, int node_size) {
+                 int n_train, int n_var, int n_basis, int mtry, int node_size,
+                 bool fit_oob) {
   // Train Tree object on training covariates and responses.
   //
   // Arguments:
@@ -19,6 +19,9 @@ void Tree::train(double* x_train, double* z_basis,
   //   n_basis: number of basis functions.
   //   mtry: number of variables to evaluate for each split.
   //   node_size: minimum weight in a leaf node.
+  //   fit_oob: boolean whether to fit out-of-bag samples. Allows
+  //     estimation of out-of-bag loss at the cost of increased
+  //     computational effort.
   //
   // Side-Effects:
   //   Builds a tree for prediction in root.
@@ -30,14 +33,16 @@ void Tree::train(double* x_train, double* z_basis,
   this -> valid_idx = valid_idx;
   this -> wts = weights;
 
-  // Remove observations with zero weight to avoid performance hit of
-  // sorting/summing over them.
-  sort_next(this -> valid_idx.begin(), this -> valid_idx.end(), weights.data());
   auto start_it = this -> valid_idx.begin();
-  for (; start_it != this -> valid_idx.end(); ++start_it) { if(weights[*start_it] > 0) { break; } }
+  if (!fit_oob) {
+    // Remove observations with zero weight to avoid performance hit of
+    // sorting/summing over them.
+    sort_next(this -> valid_idx.begin(), this -> valid_idx.end(), weights.data());
+    for (; start_it != this -> valid_idx.end(); ++start_it) { if(weights[*start_it] > 0) { break; } }
 
-  if (start_it == this -> valid_idx.end()) {
-    start_it = this -> valid_idx.begin();
+    if (start_it == this -> valid_idx.end()) {
+      start_it = this -> valid_idx.begin();
+    }
   }
 
   this -> root.train(x_train, z_basis, weights, start_it,

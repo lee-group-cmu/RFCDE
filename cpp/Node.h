@@ -18,6 +18,10 @@ public:
   Node();
   ~Node();
 
+  bool is_leaf() {
+    return(this -> split_var == -1);
+  }
+
   void train(double* x_train, double* z_basis,
              const std::vector<int>& weights,
              ivecit valid_idx_begin, ivecit valid_idx_end,
