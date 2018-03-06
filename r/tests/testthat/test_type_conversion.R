@@ -12,9 +12,9 @@ test_that("Training works for vectors", {
   min_size <- 20
   n_basis <- 15
 
-  expect_silent(RFCDE(x, z[,1], n_trees, mtry, min_size, n_basis))
-  expect_silent(RFCDE(x[,1], z, n_trees, mtry, min_size, n_basis))
-  expect_silent(RFCDE(x[,1], z[,1], n_trees, mtry, min_size, n_basis))
+  expect_silent(RFCDE(x, z[, 1], n_trees, mtry, min_size, n_basis))
+  expect_silent(RFCDE(x[, 1], z, n_trees, mtry, min_size, n_basis))
+  expect_silent(RFCDE(x[, 1], z[, 1], n_trees, mtry, min_size, n_basis))
 })
 
 test_that("Prediction works for vectors", {
@@ -31,7 +31,7 @@ test_that("Prediction works for vectors", {
 
   forest <- RFCDE(x, z, n_trees, mtry, min_size, n_basis)
 
-  expect_silent(predict(forest, x, z[,1]))
-  expect_silent(predict(forest, x[,1], z))
-  expect_silent(predict(forest, x[,1], z[,1]))
+  expect_silent(predict(forest, x, z[, 1]))
+  expect_silent(predict(forest, x[, 1], z))
+  expect_silent(predict(forest, x[, 1], z[, 1]))
 })

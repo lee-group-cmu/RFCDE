@@ -2,22 +2,25 @@
 #'
 #' @param x_train a matrix of training covariates.
 #' @param z_train a matrix of training responses.
-#' @param n_trees the number of trees in the forest.
+#' @param n_trees the number of trees in the forest. Defaults to 1000.
 #' @param mtry the number of candidate variables to try for each
-#'   split.
+#'   split. Defaults to the square root of the number of covariates.
 #' @param node_size the minimum number of observations in a leaf node.
+#'   Defaults to 5.
 #' @param n_basis the number of basis functions used in split density
-#'   estimates.
+#'   estimates. Defaults to 31.
 #' @param basis_system the system of basis functions to use; currently
-#'   "cosine" and "Haar" are supported.
+#'   "cosine" and "Haar" are supported. Defaults to "cosine"
 #' @param fit_oob whether to fit out-of-bag samples or not. Out-of-bag
 #'   samples increase the computation time but allows for estimation
 #'   of the prediction loss. Defaults to FALSE.
 #' @export
-RFCDE <- function(x_train, z_train, n_trees, mtry, node_size, n_basis,
-                      basis_system = "cosine", fit_oob=FALSE) {
-  if (!is.matrix(x_train)) { x_train <- as.matrix(x_train) }
-  if (!is.matrix(z_train)) { z_train <- as.matrix(z_train) }
+RFCDE <- function(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)),
+                  node_size = 5, n_basis = 31, basis_system = "cosine",
+                  fit_oob = FALSE) {
+  x_train <- as.matrix(x_train)
+  z_train <- as.matrix(z_train)
+
   mtry <- min(mtry, ncol(x_train))
 
   z_min <- apply(z_train, 2, min)
@@ -71,9 +74,17 @@ format.RFCDE <- function(x, ...) {
 #' @importFrom stats weights
 #' @export
 weights.RFCDE <- function(object, newdata, ...) {
-  if (!is.matrix(newdata)) {
-    newdata <- matrix(newdata, nrow = 1)
+  if (is.vector(newdata)) {
+    n_dim <- ncol(object$z_train)
+    if (n_dim == length(newdata)) {
+      newdata <- matrix(newdata, nrow = 1)
+    } else if (n_dim == 1) {
+      newdata <- matrix(newdata, ncol = 1)
+    } else {
+      stop("Prediction must have same number of covariates as training.")
+    }
   }
+
   wts <- matrix(NA, nrow(newdata), nrow(object$z_train))
   for (ii in seq_len(nrow(newdata))) {
     tmp <- rep(0L, nrow(object$z_train))
@@ -92,11 +103,15 @@ weights.RFCDE <- function(object, newdata, ...) {
 #' @return A vector of the density estimated at z_grid
 kde_estimate <- function(z_train, z_grid, weights, bandwidth = NULL) {
   if (ncol(z_train) == 1) {
-    if (is.null(bandwidth)) { bandwidth <- ks::hpi(x = z_train) }
+    if (is.null(bandwidth)) {
+      bandwidth <- ks::hpi(x = z_train)
+    }
     return(ks::kde(z_train, h = bandwidth,
                    eval.points = z_grid, w = weights)$estimate)
   } else {
-    if (is.null(bandwidth)) { bandwidth <- ks::Hpi(x = z_train) }
+    if (is.null(bandwidth)) {
+      bandwidth <- ks::Hpi(x = z_train)
+    }
     return(ks::kde(z_train, H = bandwidth,
                    eval.points = z_grid, w = weights)$estimate)
   }
@@ -115,12 +130,22 @@ kde_estimate <- function(z_train, z_grid, weights, bandwidth = NULL) {
 #' @export
 predict.RFCDE <- function(object, newdata, z_grid, bandwidth = NULL, ...) {
   n_train <- nrow(object$z_train)
-  n_dim <- nrow(object$z_train)
+  n_dim <- ncol(object$z_train)
 
-  if (is.data.frame(newdata)) { newdata <- as.matrix(newdata) }
-  if (is.vector(newdata)) { newdata <- matrix(newdata, ncol = n_dim) }
+  if (is.vector(newdata)) {
+    if (n_dim == length(newdata)) {
+      newdata <- matrix(newdata, nrow = 1)
+    } else if (n_dim == 1) {
+      newdata <- matrix(newdata, ncol = 1)
+    } else {
+      stop("Prediction must have same number of covariates as training.")
+    }
+  }
+
   stopifnot(is.matrix(newdata))
-  if (!is.matrix(z_grid)) { z_grid <- as.matrix(z_grid) }
+  if (!is.matrix(z_grid)) {
+    z_grid <- as.matrix(z_grid)
+  }
 
   n_test <- nrow(newdata)
 

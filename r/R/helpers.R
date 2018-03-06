@@ -5,5 +5,5 @@
 #' @param z_max A vector of maximum values for each dimension.
 #' @return A matrix of z projected onto the unit cube.
 box <- function(z, z_min, z_max) {
-  return((z - z_min) / (z_max - z_min))
+  return(scale(z, z_min, z_max - z_min))
 }
