@@ -13,7 +13,8 @@
 
 \item{z_grid}{grid points at which to evaluate the kernel density.}
 
-\item{bandwidth}{(optional) bandwidth for kernel density estimates.}
+\item{bandwidth}{(optional) bandwidth for kernel density estimates.
+Defaults to "auto" for automatic bandwidth selection.}
 
 \item{\dots}{additional arguments}
 }

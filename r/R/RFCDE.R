@@ -32,6 +32,7 @@ RFCDE <- function(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)),
 
   return(structure(list(z_train = z_train,
                         fit_oob = fit_oob,
+                        n_x = ncol(x_train),
                         rcpp = forest), class = "RFCDE"))
 }
 
@@ -77,15 +78,17 @@ format.RFCDE <- function(x, ...) {
 #' @export
 weights.RFCDE <- function(object, newdata, ...) {
   if (is.vector(newdata)) {
-    n_dim <- ncol(object$z_train)
-    if (n_dim == length(newdata)) {
+    if (length(newdata) == object$n_x) {
       newdata <- matrix(newdata, nrow = 1)
-    } else if (n_dim == 1) {
+    } else if (object$n_x == 1) {
       newdata <- matrix(newdata, ncol = 1)
     } else {
       stop("Prediction must have same number of covariates as training.")
     }
   }
+
+  stopifnot(is.matrix(newdata))
+  stopifnot(ncol(newdata) == object$n_x)
 
   wts <- matrix(NA, nrow(newdata), nrow(object$z_train))
   for (ii in seq_len(nrow(newdata))) {
@@ -96,27 +99,16 @@ weights.RFCDE <- function(object, newdata, ...) {
   return(wts)
 }
 
-#' Helper function for kernel density estimation.
+#' Calculate out-of-bag weights.
 #'
-#' @param z_train matrix of training covariates.
-#' @param z_grid matrix of grid points to evaluate densities.
-#' @param weights vector of weights.
-#' @param bandwidth bandwidth value or matrix.
-#' @return A vector of the density estimated at z_grid
-kde_estimate <- function(z_train, z_grid, weights, bandwidth = NULL) {
-  if (ncol(z_train) == 1) {
-    if (is.null(bandwidth)) {
-      bandwidth <- ks::hpi(x = z_train)
-    }
-    return(ks::kde(z_train, h = bandwidth,
-                   eval.points = z_grid, w = weights)$estimate)
-  } else {
-    if (is.null(bandwidth)) {
-      bandwidth <- ks::Hpi(x = z_train)
-    }
-    return(ks::kde(z_train, H = bandwidth,
-                   eval.points = z_grid, w = weights)$estimate)
-  }
+#' @param forest A RFCDE object.
+#' @return A matrix of out-of-bag weights for the training data.
+oob_weights <- function(forest) {
+  stopifnot(forest$fit_oob)
+  n_train <- nrow(forest$z_train)
+  weights <- matrix(0L, n_train, n_train)
+  forest$rcpp$fill_oob_weights(weights)
+  return(weights)
 }
 
 #' Predict conditional density estimates for RFCDE objects.
@@ -127,17 +119,19 @@ kde_estimate <- function(z_train, z_grid, weights, bandwidth = NULL) {
 #' @param newdata matrix of test covariates.
 #' @param z_grid grid points at which to evaluate the kernel density.
 #' @param bandwidth (optional) bandwidth for kernel density estimates.
+#'   Defaults to "auto" for automatic bandwidth selection.
 #' @param \dots additional arguments
 #' @importFrom stats predict
 #' @export
-predict.RFCDE <- function(object, newdata, z_grid, bandwidth = NULL, ...) {
+predict.RFCDE <- function(object, newdata, z_grid, bandwidth = "auto", ...) {
   n_train <- nrow(object$z_train)
   n_dim <- ncol(object$z_train)
+  stopifnot(ncol(z_grid) == n_dim)
 
   if (is.vector(newdata)) {
-    if (n_dim == length(newdata)) {
+    if (length(newdata) == object$n_x) {
       newdata <- matrix(newdata, nrow = 1)
-    } else if (n_dim == 1) {
+    } else if (object$n_x == 1) {
       newdata <- matrix(newdata, ncol = 1)
     } else {
       stop("Prediction must have same number of covariates as training.")
@@ -145,6 +139,7 @@ predict.RFCDE <- function(object, newdata, z_grid, bandwidth = NULL, ...) {
   }
 
   stopifnot(is.matrix(newdata))
+  stopifnot(ncol(newdata) == object$n_x)
   if (!is.matrix(z_grid)) {
     z_grid <- as.matrix(z_grid)
   }
@@ -154,7 +149,7 @@ predict.RFCDE <- function(object, newdata, z_grid, bandwidth = NULL, ...) {
   cde <- matrix(NA, n_test, nrow(z_grid))
   wts <- rep(0L, n_train)
   for (ii in seq_len(n_test)) {
-    wts <- weights(object, newdata[ii, , drop = FALSE])
+    wts <- weights(object, newdata[ii, , drop = FALSE]) #nolint
     wts <- wts * n_train / sum(wts)
     cde[ii, ] <- kde_estimate(object$z_train, z_grid, wts, bandwidth)
   }
