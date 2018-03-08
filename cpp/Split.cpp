@@ -1,4 +1,5 @@
 #include <vector>
+#include <algorithm>
 #include <random>
 #include "Split.h"
 #include "helpers.h"
@@ -27,14 +28,13 @@ Split find_best_split(double* x_train, double* z_basis,
     return best_split;
   }
 
-  int seed = 43;
-  static std::mt19937 rng(seed);
-  std::uniform_int_distribution<int> unif(0, n_var - 1);
-
-  // Find best recursive split
+  static auto rng = std::default_random_engine {};
+  std::vector<int> vars(n_var);
+  std::iota(vars.begin(), vars.end(), 0);
+  std::shuffle(vars.begin(), vars.end(), rng);
 
   for (int ii = 0; ii < mtry; ii++) {
-    int var = unif(rng);
+    int var = vars[ii];
     if (var != last_var) {
       sortby(idx_begin, idx_end, &x_train[var * n_train]);
       last_var = var;
