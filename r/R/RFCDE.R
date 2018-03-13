@@ -25,11 +25,7 @@ RFCDE <- function(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)),
 
   z_min <- apply(z_train, 2, min)
   z_max <- apply(z_train, 2, max)
-  basis_fn <- switch(basis_system,
-                     "cosine" = cosine_basis,
-                     "Haar" = haar_basis,
-                     stop(paste(basis_system, "not recognized")))
-  z_basis <- basis_fn(box(z_train, z_min, z_max), n_basis)
+  z_basis <- evaluate_basis(box(z_train, z_min, z_max), n_basis, basis_system)
 
   forest <- methods::new(ForestRcpp)
   forest$train(x_train, z_basis, n_trees, mtry, node_size, fit_oob)
