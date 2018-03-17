@@ -38,10 +38,15 @@ RFCDE <- function(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)),
 #' Print method for RFCDE objects
 #'
 #' @param x A RFCDE object.
+#' @param ... Other arguments to print
 print.RFCDE <- function(x, ...) {
   cat(format(x, ...), sep = "\n")
 }
 
+#' Summary method for RFCDE objects
+#'
+#' @param x A RFCDE object.
+#' @param ... Other arguments to summary
 summary.RFCDE <- function(x, ...) {
   print(x)
 }
@@ -49,6 +54,7 @@ summary.RFCDE <- function(x, ...) {
 #' Format method for RFCDE objects
 #'
 #' @param x A RFCDE object.
+#' @param ... Other arguments to format
 format.RFCDE <- function(x, ...) {
   return(c("RFCDE object:",
            paste("n_train =", nrow(x$z_train)),

@@ -43,7 +43,7 @@ evaluate_basis <- function(z, n_basis, system = "cosine") {
 #' @param n_basis integer vector of how many basis functions should be
 #'   calculated for each dimension. If not same length as the number
 #'   of columns of `z` will recycle.
-#' @param system vector of strings indicating the basis system to be
+#' @param systems vector of strings indicating the basis system to be
 #'   used. Options are "cosine", "Fourier", "Haar", and "Daubechies".
 #'   If not same length as the number of columns of `z` will recycle.
 #'
@@ -103,7 +103,7 @@ cosine_basis <- function(z, n_basis) {
 }
 
 #' Evaluates Haar basis for new observations
-#' @inheritParams calculateBasis
+#' @inheritParams evaluate_basis
 #' @return A matrix of dimension length(z) by n_basis with entries
 #'   consisting of the first n_basis Haar basis functions evaluated
 #'   at the points z

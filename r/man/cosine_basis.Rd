@@ -2,19 +2,24 @@
 % Please edit documentation in R/basis_functions.R
 \name{cosine_basis}
 \alias{cosine_basis}
-\title{Evaluate cosine basis}
+\title{Evaluates cosine basis for new observations}
 \usage{
 cosine_basis(z, n_basis)
 }
 \arguments{
-\item{z}{points at which to evaluate the basis}
+\item{z}{matrix whose row correspond to observations and whose
+columns correspond to dimensions. Assumes each column has been
+scaled to [0, 1].}
 
-\item{n_basis}{number of basis functions}
+\item{n_basis}{integer number of how many basis functions should be
+calculated for each dimension. If not same length as the number
+of columns of `z` will recycle.}
 }
 \value{
-matrix of basis evaluations, each column corresponds to a
-  basis function, each row corresponds to a z point
+A matrix of dimension length(z) by n_basis with entries
+  consisting of the first n_basis cosine basis functions evaluated
+  at the points z
 }
 \description{
-Evaluate cosine basis
+Evaluates cosine basis for new observations
 }

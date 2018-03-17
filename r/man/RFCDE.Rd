@@ -4,26 +4,31 @@
 \alias{RFCDE}
 \title{Fits a conditional density estimate random forest to training data.}
 \usage{
-RFCDE(x_train, z_train, n_trees, mtry, node_size, n_basis,
-  basis_system = "cosine")
+RFCDE(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)),
+  node_size = 5, n_basis = 31, basis_system = "cosine", fit_oob = FALSE)
 }
 \arguments{
 \item{x_train}{a matrix of training covariates.}
 
 \item{z_train}{a matrix of training responses.}
 
-\item{n_trees}{the number of trees in the forest.}
+\item{n_trees}{the number of trees in the forest. Defaults to 1000.}
 
 \item{mtry}{the number of candidate variables to try for each
-split.}
+split. Defaults to the square root of the number of covariates.}
 
-\item{node_size}{the minimum number of observations in a leaf node.}
+\item{node_size}{the minimum number of observations in a leaf node.
+Defaults to 5.}
 
 \item{n_basis}{the number of basis functions used in split density
-estimates.}
+estimates. Defaults to 31.}
 
-\item{basis_system}{the system of basis functions to use;
-currently "cosine" and "Haar" are supported.}
+\item{basis_system}{the system of basis functions to use; currently
+"cosine" and "Haar" are supported. Defaults to "cosine"}
+
+\item{fit_oob}{whether to fit out-of-bag samples or not. Out-of-bag
+samples increase the computation time but allows for estimation
+of the prediction loss. Defaults to FALSE.}
 }
 \description{
 Fits a conditional density estimate random forest to training data.
