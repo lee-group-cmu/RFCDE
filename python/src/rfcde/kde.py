@@ -1,22 +1,7 @@
 """Functions for weighted kernel density estimation."""
 
 import numpy as np
-
-def _gauss_kernel(vecs):
-    """Evaluates Gaussian kernel.
-
-    Arguments
-    ---------
-    vecs : numpy matrix
-       A matrix of differences from the target point.
-
-    Returns
-    -------
-    float
-        The gaussian kernel evaluated from each row in `vecs`.
-
-    """
-    return np.exp(-(vecs ** 2).sum(1) / 2.0) / np.sqrt(2.0 * np.pi)
+import scipy.stats
 
 def kde(responses, grid, weights, bandwidth):
     """Calculates the weighted kernel density estimate.
@@ -40,12 +25,12 @@ def kde(responses, grid, weights, bandwidth):
        The density evaluated at the grid points.
 
     """
-    n_grid = grid.shape[0]
-
-    tot_weight = sum(weights)
-
+    n_grid, n_dim = grid.shape
     density = np.zeros(n_grid)
+    if isinstance(bandwidth, (float, int)):
+        bandwidth = bandwidth ** 2 * np.eye(n_dim)
     for igrid in range(n_grid):
-        vecs = (grid[igrid, :] - responses) / bandwidth
-        density[igrid] = np.sum(weights * _gauss_kernel(vecs))
-    return density / (bandwidth * tot_weight)
+        dist = scipy.stats.multivariate_normal(mean = grid[igrid, :],
+                                               cov = bandwidth)
+        density[igrid] = np.sum(weights * dist.pdf(responses))
+    return density / np.sum(weights)

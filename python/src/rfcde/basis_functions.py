@@ -36,7 +36,7 @@ def evaluate_basis(responses, n_basis, basis_system):
     if n_dim  == 1:
         return basis_fn(responses, n_basis)
     else:
-        if len(n_basis) == 1:
+        if isinstance(n_basis, int):
             n_basis = [n_basis] * n_dim
         return tensor_basis(responses, n_basis, basis_fn)
 
