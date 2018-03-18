@@ -28,7 +28,7 @@ for e in ext_modules:
     e.cython_directives = {"embedsignature": True}
 
 setup(name="rfcde",
-      version="0.1",
+      version="0.1.1",
       license="MIT",
       description="Fits random forest conditional density estimate using conditional density loss for splits.",
       long_description = README_TEXT,
