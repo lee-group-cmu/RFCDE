@@ -39,6 +39,8 @@ class RFCDE(object):
         The number of variables to evaluate at each split.
     node_size : integer
        The minimum number of observations in each leaf node.
+    min_loss_delta : float
+       The minimum change in loss for a split.
     n_basis : integer
        The number of basis functions used for split density estimates.
     basis_system : {'cosine'}
@@ -52,27 +54,32 @@ class RFCDE(object):
         The number of variables to evaluate at each split.
     node_size : integer
        The minimum number of observations in each leaf node.
+    min_loss_delta : float
+       The minimum change in loss for a split.
     n_basis : integer
        The number of basis functions used for split density estimates.
     basis_system : {'cosine'}
        The basis system for split density estimates.
     z_train : numpy array/matrix
        The training responses. Each value/row corresponds to an observation.
+    fit_oob: boolean
+       Whether the forest has fit out-of-bag samples.
     forest : ForestWrapper
        Wrapped C++ forest
 
     """
-    def __init__(self, n_trees, mtry, node_size, n_basis=15,
-                 basis_system='cosine'):
+    def __init__(self, n_trees, mtry, node_size, min_loss_delta=0.0,
+                 n_basis=15, basis_system='cosine'):
         self.n_trees = n_trees
         self.mtry = mtry
         self.node_size = node_size
+        self.min_loss_delta = min_loss_delta
         self.n_basis = n_basis
         self.z_train = None
         self.basis_system = basis_system
         self.forest = ForestWrapper()
 
-    def train(self, x_train, z_train):
+    def train(self, x_train, z_train, fit_oob = False):
         """Train RFCDE object on training data.
 
         Arguments
@@ -83,6 +90,8 @@ class RFCDE(object):
         z_train : numpy array/matrix
            The training responses. Each value/row corresponds to an
            observation.
+        fit_oob : boolean
+           Whether to fit out-of-bag observations.
 
         """
         # Coerce to matrices
@@ -104,8 +113,9 @@ class RFCDE(object):
                                  self.basis_system)
 
         self.forest.train(np.asfortranarray(x_train), np.asfortranarray(z_basis),
-                          self.n_trees,
-                          self.mtry, self.node_size)
+                          self.n_trees, self.mtry, self.node_size,
+                          self.min_loss_delta, fit_oob)
+        self.fit_oob = fit_oob
 
     def weights(self, x_new):
         """Calculate weights from forest tree structure.

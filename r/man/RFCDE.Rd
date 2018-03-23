@@ -5,7 +5,8 @@
 \title{Fits a conditional density estimate random forest to training data.}
 \usage{
 RFCDE(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)),
-  node_size = 5, n_basis = 31, basis_system = "cosine", fit_oob = FALSE)
+  node_size = 5, n_basis = 31, basis_system = "cosine",
+  min_loss_delta = 0, fit_oob = FALSE)
 }
 \arguments{
 \item{x_train}{a matrix of training covariates.}
@@ -25,6 +26,8 @@ estimates. Defaults to 31.}
 
 \item{basis_system}{the system of basis functions to use; currently
 "cosine" and "Haar" are supported. Defaults to "cosine"}
+
+\item{min_loss_delta}{the minimum loss for a split. Defaults to 0.0.}
 
 \item{fit_oob}{whether to fit out-of-bag samples or not. Out-of-bag
 samples increase the computation time but allows for estimation

@@ -8,9 +8,9 @@ class Split {
  public:
   int var;
   int offset;
-  double loss;
+  double loss_delta;
 
- Split() : var(-1), offset(-1), loss(1.0) {}
+ Split() : var(-1), offset(-1), loss_delta(0.0) {}
 };
 
 Split find_best_split(double* x_train, double* z_basis,

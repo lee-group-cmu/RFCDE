@@ -9,7 +9,7 @@ class Forest {
 
   void train(double* x_train, double* z_basis,
              int n_train, int n_var, int n_basis, int n_trees, int mtry,
-             int node_size, bool fit_oob);
+             int node_size, double min_loss_delta, bool fit_oob);
 
   // Python uses longs for their integers; use template for easy
   // wrapping.
@@ -27,6 +27,17 @@ class Forest {
     }
   };
 
+  void fill_loss_importance(double* scores) {
+    for (auto &tree : trees) {
+      tree.update_loss_importance(scores);
+    }
+  };
+
+  void fill_count_importance(double* scores) {
+    for (auto &tree : trees) {
+      tree.update_count_importance(scores);
+    }
+  };
 };
 
 void draw_weights(std::vector<int>& weights);

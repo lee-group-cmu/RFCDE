@@ -7,7 +7,7 @@
 void Tree::train(double* x_train, double* z_basis,
                  const std::vector<int>& weights,
                  int n_train, int n_var, int n_basis, int mtry, int node_size,
-                 bool fit_oob) {
+                 double min_loss_delta, bool fit_oob) {
   // Train Tree object on training covariates and responses.
   //
   // Arguments:
@@ -19,6 +19,7 @@ void Tree::train(double* x_train, double* z_basis,
   //   n_basis: number of basis functions.
   //   mtry: number of variables to evaluate for each split.
   //   node_size: minimum weight in a leaf node.
+  //   min_loss_delta: the minimum change in loss for a split.
   //   fit_oob: boolean whether to fit out-of-bag samples. Allows
   //     estimation of out-of-bag loss at the cost of increased
   //     computational effort.
@@ -47,7 +48,7 @@ void Tree::train(double* x_train, double* z_basis,
 
   this -> root.train(x_train, z_basis, weights, start_it,
                      this -> valid_idx.end(),
-                     n_train, n_var, n_basis, mtry, node_size);
+                     n_train, n_var, n_basis, mtry, node_size, min_loss_delta);
 }
 
 Node Tree::traverse(double* x_test) {

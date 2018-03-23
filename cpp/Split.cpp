@@ -9,7 +9,9 @@ typedef std::vector<int>::iterator ivecit;
 Split find_best_split(double* x_train, double* z_basis,
                       const std::vector<int>& weights,
                       ivecit idx_begin, ivecit idx_end,
-                      int n_train, int n_basis, int n_var, int mtry, int node_size, int& last_var) {
+                      int n_train, int n_basis, int n_var, int mtry,
+                      int node_size, int& last_var) {
+  Split best_split;
 
   // Initialize total_sum and total_weight
   int total_weight = 0;
@@ -21,11 +23,14 @@ Split find_best_split(double* x_train, double* z_basis,
     }
   }
 
-  Split best_split;
-
   // Can quit early if not enough weight for split
   if (total_weight < 2 * node_size) {
     return best_split;
+  }
+
+  double initial_loss = 0.0;
+  for (int bb = 0; bb < n_basis; bb++) {
+    initial_loss -= total_sum[bb] / total_weight * total_sum[bb];
   }
 
   static auto rng = std::default_random_engine {};
@@ -40,19 +45,20 @@ Split find_best_split(double* x_train, double* z_basis,
       last_var = var;
     }
 
-    Split split = evaluate_split(x_train, z_basis, weights, idx_begin, idx_end,
+    Split split = evaluate_split(&x_train[var * n_train],
+                                 z_basis, weights, idx_begin, idx_end,
                                  n_train, n_basis, node_size,
                                  total_weight, total_sum);
 
-    if (split.loss < best_split.loss) {
+    if (split.loss_delta < best_split.loss_delta) {
       best_split = split;
       best_split.var = var;
     }
   }
 
+  best_split.loss_delta = initial_loss - best_split.loss_delta;
   return best_split;
 }
-
 
 Split evaluate_split(const double* x_train, const double* z_basis,
                      const std::vector<int>& weights,
@@ -87,18 +93,24 @@ Split evaluate_split(const double* x_train, const double* z_basis,
   int le_weight = 0;
   std::vector<double> le_sum(n_basis, 0.0);
 
-  Split best_split;
+  Split split;
+  split.loss_delta = 0.0; // initialize zero as losses are negative
+  split.offset = -1;
   for (auto it = idx_begin; it != idx_end; ++it) {
+    // Update for next observation
     le_weight += weights[*it];
     for (int bb = 0; bb < n_basis; bb++) {
-      le_sum[bb] += z_basis[bb * n_train + *it] * weights[*it];
+      le_sum[bb] += z_basis[n_train * bb + *it] * weights[*it];
     }
 
     // Enforce node_size constraint on minimum weight in a leaf node.
-    if (le_weight <= node_size || total_weight - le_weight <= node_size) {
-      continue;
-    }
+    if (le_weight < node_size) { continue; };
+    if (total_weight - le_weight < node_size) { break; }
 
+    // Enforce <= constraint
+    if (x_train[*it] == x_train[*(it + 1)]) { continue; }
+
+    // Calculate loss
     double loss = 0.0;
     for (int bb = 0; bb < n_basis; bb++) {
       loss -= le_sum[bb] * le_sum[bb] / le_weight;
@@ -106,10 +118,11 @@ Split evaluate_split(const double* x_train, const double* z_basis,
         (total_weight - le_weight);
     }
 
-    if (loss < best_split.loss && x_train[*it] != x_train[*(it + 1)]) {
-      best_split.loss = loss;
-      best_split.offset = it - idx_begin;
+    if (loss < split.loss_delta) {
+      split.loss_delta = loss;
+      split.offset = it - idx_begin;
     }
   }
-  return best_split;
+
+  return split;
 }

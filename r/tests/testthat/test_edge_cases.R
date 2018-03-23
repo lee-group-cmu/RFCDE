@@ -1,6 +1,8 @@
 context("Test edge cases")
 
 test_that("Node size is respected", {
+  set.seed(32)
+
   n <- 1000
   x <- matrix(runif(n))
   z <- matrix(runif(n))
@@ -15,6 +17,8 @@ test_that("Node size is respected", {
 })
 
 test_that("Binary splits are respected", {
+  set.seed(32)
+
   n <- 1000
   x <- matrix(sample(1:2, n, replace = TRUE))
   z <- matrix(rnorm(n))

@@ -11,13 +11,14 @@
 #'   estimates. Defaults to 31.
 #' @param basis_system the system of basis functions to use; currently
 #'   "cosine" and "Haar" are supported. Defaults to "cosine"
+#' @param min_loss_delta the minimum loss for a split. Defaults to 0.0.
 #' @param fit_oob whether to fit out-of-bag samples or not. Out-of-bag
 #'   samples increase the computation time but allows for estimation
 #'   of the prediction loss. Defaults to FALSE.
 #' @export
 RFCDE <- function(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)),
                   node_size = 5, n_basis = 31, basis_system = "cosine",
-                  fit_oob = FALSE) {
+                  min_loss_delta = 0.0,  fit_oob = FALSE) {
   x_train <- as.matrix(x_train)
   z_train <- as.matrix(z_train)
 
@@ -28,9 +29,16 @@ RFCDE <- function(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)),
   z_basis <- evaluate_basis(box(z_train, z_min, z_max), n_basis, basis_system)
 
   forest <- methods::new(ForestRcpp)
-  forest$train(x_train, z_basis, n_trees, mtry, node_size, fit_oob)
+  forest$train(x_train, z_basis, n_trees, mtry, node_size,
+               min_loss_delta, fit_oob)
+
+  x_names <- colnames(x_train)
+  if (is.null(x_names)) {
+    x_names <- 1:ncol(x_train)
+  }
 
   return(structure(list(z_train = z_train,
+                        x_names = x_names,
                         fit_oob = fit_oob,
                         n_x = ncol(x_train),
                         rcpp = forest), class = "RFCDE"))
@@ -155,4 +163,26 @@ predict.RFCDE <- function(object, newdata, z_grid, bandwidth = "auto", ...) {
   }
 
   return(cde)
+}
+
+#' Calculate variable importance measures for RFCDE.
+#'
+#' @param forest a RFCDE object
+#' @param type the type of importance measure; options are "count" and
+#'   "loss".
+#' @export
+variable_importance <- function(forest, type = c("count", "loss")) {
+  n_x <- length(forest$x_names)
+  imp <- rep(0.0, n_x)
+  type <- match.arg(type)
+  if (type == "count") {
+    forest$rcpp$fill_count_importance(imp)
+  } else if (type == "loss") {
+    forest$rcpp$fill_loss_importance(imp)
+    counts <- rep(0.0, n_x)
+    forest$rcpp$fill_count_importance(counts)
+    imp <- imp / counts
+  }
+  names(imp) <- forest$x_names
+  return(imp)
 }

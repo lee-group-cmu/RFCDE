@@ -4,7 +4,7 @@
 #include "Node.h"
 
 class Tree {
-public:
+ public:
   Node root;
   int n_train;
   std::vector<int> valid_idx;
@@ -12,7 +12,7 @@ public:
 
   void train(double* x_train, double* z_basis, const std::vector<int>& weights,
              int n_train, int n_var, int n_basis, int mtry, int node_size,
-             bool fit_oob);
+             double min_loss_delta, bool fit_oob);
   Node traverse(double* x_test);
 
   // Use template since Python uses longs and R uses ints for their
@@ -58,6 +58,55 @@ public:
     update_oob_weights_helper(wt_mat, &(this -> root));
   };
 
+
+
+  void update_loss_importance(double* scores, Node* current = NULL) {
+    // Update variable importance counts
+    //
+    // Traverse down the tree and decreased loss for the selected
+    // variable.
+    //
+    // Arguments:
+    //   scores: a pointer to a scores vector; should have length equal
+    //     to the number of covariates.
+    //   current: current node being processed; default is NULL for the
+    //     root node.
+    //   parent_loss: the loss of the parent node
+    // Side-Effects: increases the score of the covariate used to
+    //   split the current node; default is overwritten for root node.
+    if (current == NULL) {
+      current = &(this -> root);
+    }
+
+    if (!current -> is_leaf()) {
+      scores[current -> split_var] += current -> loss_delta;
+      update_loss_importance(scores, current -> le_child);
+      update_loss_importance(scores, current -> gt_child);
+    }
+  };
+
+
+  void update_count_importance(double* scores, Node* current = NULL) {
+    // Update variable importance counts
+    //
+    // Traverse down the tree and increment for each time a variable
+    // is selected.
+    //
+    // Arguments:
+    //   scores: a pointer to a scores vector; should have length equal
+    //     to the number of covariates.
+    //   current: current node being processed; default is NULL for the
+    //     root node.
+    // Side-Effects: increments score of the covariate used to split
+    //   the current node
+    if (current == NULL) { current = &(this -> root); }
+
+    if (!current -> is_leaf()) {
+      scores[current -> split_var] += 1.0;
+      update_count_importance(scores, current -> le_child);
+      update_count_importance(scores, current -> gt_child);
+    }
+  };
 };
 
 #endif

@@ -23,13 +23,13 @@ private:
   Forest obj;
 public:
   void train(NumericMatrix x_train, NumericMatrix z_basis, int n_trees,
-             int mtry, int node_size, bool fit_oob) {
+             int mtry, int node_size, double min_loss_delta, bool fit_oob) {
     int n_train = x_train.nrow();
     int n_var = x_train.ncol();
     int n_basis = z_basis.ncol();
 
     obj.train(&x_train(0,0), &z_basis(0,0), n_train, n_var, n_basis,
-              n_trees, mtry, node_size, fit_oob);
+              n_trees, mtry, node_size, min_loss_delta, fit_oob);
   };
 
   void fill_weights(Rcpp::NumericVector x_test, Rcpp::IntegerVector weights) {
@@ -39,6 +39,14 @@ public:
   void fill_oob_weights(Rcpp::IntegerMatrix weights) {
     obj.fill_oob_weights(&weights(0,0));
   };
+
+  void fill_loss_importance(Rcpp::NumericVector scores) {
+    obj.fill_loss_importance(&scores(0));
+  };
+
+  void fill_count_importance(Rcpp::NumericVector scores) {
+    obj.fill_count_importance(&scores(0));
+  };
 };
 
 RCPP_MODULE(RFCDEModule) {
@@ -47,5 +55,7 @@ RCPP_MODULE(RFCDEModule) {
     .method("train", &ForestRcpp::train)
     .method("fill_weights", &ForestRcpp::fill_weights)
     .method("fill_oob_weights", &ForestRcpp::fill_oob_weights)
+    .method("fill_loss_importance", &ForestRcpp::fill_loss_importance)
+    .method("fill_count_importance", &ForestRcpp::fill_count_importance)
     ;
 }
