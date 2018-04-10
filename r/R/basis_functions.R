@@ -19,7 +19,7 @@ evaluate_basis <- function(z, n_basis, system = "cosine") {
 
   n_dim <- ncol(z)
   if (n_dim == 1) {
-    system <- match.arg(system, c("cosine"))
+    system <- match.arg(system, c("cosine", "Haar"))
     basis_function <- switch(system,
                              cosine = cosine_basis,
                              Haar = haar_basis)
