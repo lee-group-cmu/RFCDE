@@ -154,7 +154,7 @@ predict.RFCDE <- function(object, newdata, z_grid, bandwidth = NULL, ...) {
   cde <- matrix(NA, n_test, nrow(z_grid))
   wts <- rep(0L, n_train)
   for (ii in seq_len(n_test)) {
-    wts <- weights(object, newdata[ii, ])
+    wts <- weights(object, newdata[ii, , drop = FALSE])
     wts <- wts * n_train / sum(wts)
     cde[ii, ] <- kde_estimate(object$z_train, z_grid, wts, bandwidth)
   }
