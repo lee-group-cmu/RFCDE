@@ -185,6 +185,6 @@ class RFCDE(object):
         n_grid = z_grid.shape[0]
         cde = np.zeros((n_test, n_grid))
         for idx in range(n_test):
-            weights = self.weights(x_new[idx, :])
+            weights = self.weights(np.ascontiguousarray(x_new[idx, :]))
             cde[idx, :] = kde(self.z_train, z_grid, weights, bandwidth)
         return cde
