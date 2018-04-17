@@ -1,0 +1,304 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>rfcde.core &#8212; RFCDE 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rfcde.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Provides the RFCDE class for fitting RFCDE models.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.basis_functions</span> <span class="k">import</span> <span class="n">evaluate_basis</span>
+<span class="kn">from</span> <span class="nn">.kde</span> <span class="k">import</span> <span class="n">kde</span>
+<span class="kn">from</span> <span class="nn">.ForestWrapper</span> <span class="k">import</span> <span class="n">ForestWrapper</span>
+
+<span class="c1"># Helper function</span>
+<span class="k">def</span> <span class="nf">_box</span><span class="p">(</span><span class="n">responses</span><span class="p">,</span> <span class="n">box_min</span><span class="p">,</span> <span class="n">box_max</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Projects responses from box [box_min, box_max] to [0, 1].</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    responses : numpy array</span>
+<span class="sd">       An array of values in [box_min, box_max] to be projected.</span>
+<span class="sd">    box_min : float</span>
+<span class="sd">       The minimum value of a box containing responses.</span>
+<span class="sd">    box_max : float</span>
+<span class="sd">       The maximum value of a box containing responses.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy array</span>
+<span class="sd">       responses projected onto [0, 1].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">responses</span> <span class="o">-</span> <span class="n">box_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">box_max</span> <span class="o">-</span> <span class="n">box_min</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RFCDE"><a class="viewcode-back" href="../../api.html#rfcde.core.RFCDE">[docs]</a><span class="k">class</span> <span class="nc">RFCDE</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Object for RFCDE.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    n_trees : integer</span>
+<span class="sd">        The number of trees to train.</span>
+<span class="sd">    mtry : integer</span>
+<span class="sd">        The number of variables to evaluate at each split.</span>
+<span class="sd">    node_size : integer</span>
+<span class="sd">       The minimum number of observations in each leaf node.</span>
+<span class="sd">    min_loss_delta : float</span>
+<span class="sd">       The minimum change in loss for a split.</span>
+<span class="sd">    n_basis : integer</span>
+<span class="sd">       The number of basis functions used for split density estimates.</span>
+<span class="sd">    basis_system : {&#39;cosine&#39;}</span>
+<span class="sd">       The basis system for split density estimates.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_trees : integer</span>
+<span class="sd">        The number of trees to train.</span>
+<span class="sd">    mtry : integer</span>
+<span class="sd">        The number of variables to evaluate at each split.</span>
+<span class="sd">    node_size : integer</span>
+<span class="sd">       The minimum number of observations in each leaf node.</span>
+<span class="sd">    min_loss_delta : float</span>
+<span class="sd">       The minimum change in loss for a split.</span>
+<span class="sd">    n_basis : integer</span>
+<span class="sd">       The number of basis functions used for split density estimates.</span>
+<span class="sd">    basis_system : {&#39;cosine&#39;}</span>
+<span class="sd">       The basis system for split density estimates.</span>
+<span class="sd">    z_train : numpy array/matrix</span>
+<span class="sd">       The training responses. Each value/row corresponds to an observation.</span>
+<span class="sd">    fit_oob: boolean</span>
+<span class="sd">       Whether the forest has fit out-of-bag samples.</span>
+<span class="sd">    forest : ForestWrapper</span>
+<span class="sd">       Wrapped C++ forest</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_trees</span><span class="p">,</span> <span class="n">mtry</span><span class="p">,</span> <span class="n">node_size</span><span class="p">,</span> <span class="n">min_loss_delta</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">n_basis</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">basis_system</span><span class="o">=</span><span class="s1">&#39;cosine&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_trees</span> <span class="o">=</span> <span class="n">n_trees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mtry</span> <span class="o">=</span> <span class="n">mtry</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_size</span> <span class="o">=</span> <span class="n">node_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_loss_delta</span> <span class="o">=</span> <span class="n">min_loss_delta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_basis</span> <span class="o">=</span> <span class="n">n_basis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_train</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis_system</span> <span class="o">=</span> <span class="n">basis_system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">forest</span> <span class="o">=</span> <span class="n">ForestWrapper</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RFCDE.train"><a class="viewcode-back" href="../../api.html#rfcde.core.RFCDE.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">z_train</span><span class="p">,</span> <span class="n">fit_oob</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Train RFCDE object on training data.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        x_train : numpy array/matrix</span>
+<span class="sd">           The training covariates. Each value/row corresponds to an</span>
+<span class="sd">           observation.</span>
+<span class="sd">        z_train : numpy array/matrix</span>
+<span class="sd">           The training responses. Each value/row corresponds to an</span>
+<span class="sd">           observation.</span>
+<span class="sd">        fit_oob : boolean</span>
+<span class="sd">           Whether to fit out-of-bag observations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Coerce to matrices</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">x_train</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">x_train</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">z_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">z_train</span> <span class="o">=</span> <span class="n">z_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">z_train</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_train</span> <span class="o">=</span> <span class="n">z_train</span>
+
+        <span class="n">z_min</span> <span class="o">=</span> <span class="n">z_train</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">z_max</span> <span class="o">=</span> <span class="n">z_train</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtry</span> <span class="o">&gt;</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;mtry larger than number of covariates; </span><span class="se">\</span>
+<span class="s2">            setting mtry to number of covariates&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mtry</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">z_basis</span> <span class="o">=</span> <span class="n">evaluate_basis</span><span class="p">(</span><span class="n">_box</span><span class="p">(</span><span class="n">z_train</span><span class="p">,</span> <span class="n">z_min</span><span class="p">,</span> <span class="n">z_max</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_basis</span><span class="p">,</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">basis_system</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">forest</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">x_train</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">z_basis</span><span class="p">),</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">n_trees</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtry</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_size</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">min_loss_delta</span><span class="p">,</span> <span class="n">fit_oob</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_oob</span> <span class="o">=</span> <span class="n">fit_oob</span></div>
+
+<div class="viewcode-block" id="RFCDE.weights"><a class="viewcode-back" href="../../api.html#rfcde.core.RFCDE.weights">[docs]</a>    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_new</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate weights from forest tree structure.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        x_test : numpy array</span>
+<span class="sd">            A new observation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy array</span>
+<span class="sd">            The weights of each training point for the new observation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">forest</span><span class="o">.</span><span class="n">weights</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RFCDE.oob_weights"><a class="viewcode-back" href="../../api.html#rfcde.core.RFCDE.oob_weights">[docs]</a>    <span class="k">def</span> <span class="nf">oob_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates out-of-bag weights from forest tree structure.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy matrix</span>
+<span class="sd">            A matrix with element [ii, jj] being the out-of-bag weight</span>
+<span class="sd">            for training point jj when predicting for training point</span>
+<span class="sd">            ii.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the forest was not fit with out-of-bag samples.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_oob</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Forest was not fit with out-of-bag samples&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">forest</span><span class="o">.</span><span class="n">oob_weights</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RFCDE.predict"><a class="viewcode-back" href="../../api.html#rfcde.core.RFCDE.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">z_grid</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate KDE conditional density estimate for new observations.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        x_new : numpy array/matrix</span>
+<span class="sd">           The covariates for the new observations. Each row/value</span>
+<span class="sd">           corresponds to an observation. Must have the same</span>
+<span class="sd">           dimensionality as the training covariates.</span>
+<span class="sd">        z_grid : numpy array/matrix</span>
+<span class="sd">           The grid points at which to estimate the conditional</span>
+<span class="sd">           densities.</span>
+<span class="sd">        bandwidth : float</span>
+<span class="sd">           The bandwidth for the kernel density estimates.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy matrix</span>
+<span class="sd">           A matrix of conditional density estimates; each column</span>
+<span class="sd">          corresponds to a grid point, each row corresponds to an</span>
+<span class="sd">          observation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Coerce to matrices</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">z_grid</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">z_grid</span> <span class="o">=</span> <span class="n">z_grid</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">z_grid</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_new</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">x_new</span> <span class="o">=</span> <span class="n">x_new</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_new</span><span class="p">)))</span>
+
+        <span class="n">n_test</span> <span class="o">=</span> <span class="n">x_new</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n_grid</span> <span class="o">=</span> <span class="n">z_grid</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cde</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_test</span><span class="p">,</span> <span class="n">n_grid</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_test</span><span class="p">):</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">x_new</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:]))</span>
+            <span class="n">cde</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">kde</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z_train</span><span class="p">,</span> <span class="n">z_grid</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cde</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">RFCDE</a></h1>
+
+
+
+<p class="blurb">Random Forests for Conditional Density Estimation</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=tpospisi&repo=RFCDE&type=fork&count=False&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a href="https://travis-ci.org/tpospisi/RFCDE">
+    <img
+        alt="https://secure.travis-ci.org/tpospisi/RFCDE.svg?branch=master"
+        src="https://secure.travis-ci.org/tpospisi/RFCDE.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">RFCDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API reference</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Taylor Pospisil.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

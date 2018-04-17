@@ -1,0 +1,295 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>API reference &#8212; RFCDE 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="RFCDE" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="api-reference">
+<h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-rfcde.core">
+<span id="rfcde-core"></span><h2>rfcde.core<a class="headerlink" href="#module-rfcde.core" title="Permalink to this headline">¶</a></h2>
+<p>Provides the RFCDE class for fitting RFCDE models.</p>
+<dl class="class">
+<dt id="rfcde.core.RFCDE">
+<em class="property">class </em><code class="descclassname">rfcde.core.</code><code class="descname">RFCDE</code><span class="sig-paren">(</span><em>n_trees</em>, <em>mtry</em>, <em>node_size</em>, <em>min_loss_delta=0.0</em>, <em>n_basis=15</em>, <em>basis_system='cosine'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rfcde/core.html#RFCDE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfcde.core.RFCDE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object for RFCDE.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n_trees</strong> (<em>integer</em>) – The number of trees to train.</li>
+<li><strong>mtry</strong> (<em>integer</em>) – The number of variables to evaluate at each split.</li>
+<li><strong>node_size</strong> (<em>integer</em>) – The minimum number of observations in each leaf node.</li>
+<li><strong>min_loss_delta</strong> (<em>float</em>) – The minimum change in loss for a split.</li>
+<li><strong>n_basis</strong> (<em>integer</em>) – The number of basis functions used for split density estimates.</li>
+<li><strong>basis_system</strong> (<em>{'cosine'}</em>) – The basis system for split density estimates.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="rfcde.core.RFCDE.n_trees">
+<code class="descname">n_trees</code><a class="headerlink" href="#rfcde.core.RFCDE.n_trees" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>integer</em> – The number of trees to train.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfcde.core.RFCDE.mtry">
+<code class="descname">mtry</code><a class="headerlink" href="#rfcde.core.RFCDE.mtry" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>integer</em> – The number of variables to evaluate at each split.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfcde.core.RFCDE.node_size">
+<code class="descname">node_size</code><a class="headerlink" href="#rfcde.core.RFCDE.node_size" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>integer</em> – The minimum number of observations in each leaf node.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfcde.core.RFCDE.min_loss_delta">
+<code class="descname">min_loss_delta</code><a class="headerlink" href="#rfcde.core.RFCDE.min_loss_delta" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – The minimum change in loss for a split.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfcde.core.RFCDE.n_basis">
+<code class="descname">n_basis</code><a class="headerlink" href="#rfcde.core.RFCDE.n_basis" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>integer</em> – The number of basis functions used for split density estimates.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfcde.core.RFCDE.basis_system">
+<code class="descname">basis_system</code><a class="headerlink" href="#rfcde.core.RFCDE.basis_system" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>{‘cosine’}</em> – The basis system for split density estimates.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfcde.core.RFCDE.z_train">
+<code class="descname">z_train</code><a class="headerlink" href="#rfcde.core.RFCDE.z_train" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy array/matrix</em> – The training responses. Each value/row corresponds to an observation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfcde.core.RFCDE.fit_oob">
+<code class="descname">fit_oob</code><a class="headerlink" href="#rfcde.core.RFCDE.fit_oob" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>boolean</em> – Whether the forest has fit out-of-bag samples.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfcde.core.RFCDE.forest">
+<code class="descname">forest</code><a class="headerlink" href="#rfcde.core.RFCDE.forest" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>ForestWrapper</em> – Wrapped C++ forest</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfcde.core.RFCDE.oob_weights">
+<code class="descname">oob_weights</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rfcde/core.html#RFCDE.oob_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfcde.core.RFCDE.oob_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates out-of-bag weights from forest tree structure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A matrix with element [ii, jj] being the out-of-bag weight
+for training point jj when predicting for training point
+ii.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy matrix</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> – If the forest was not fit with out-of-bag samples.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfcde.core.RFCDE.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>x_new</em>, <em>z_grid</em>, <em>bandwidth</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rfcde/core.html#RFCDE.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfcde.core.RFCDE.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate KDE conditional density estimate for new observations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x_new</strong> (<em>numpy array/matrix</em>) – The covariates for the new observations. Each row/value
+corresponds to an observation. Must have the same
+dimensionality as the training covariates.</li>
+<li><strong>z_grid</strong> (<em>numpy array/matrix</em>) – The grid points at which to estimate the conditional
+densities.</li>
+<li><strong>bandwidth</strong> (<em>float</em>) – The bandwidth for the kernel density estimates.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A matrix of conditional density estimates; each column
+corresponds to a grid point, each row corresponds to an
+observation.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy matrix</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfcde.core.RFCDE.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>x_train</em>, <em>z_train</em>, <em>fit_oob=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rfcde/core.html#RFCDE.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfcde.core.RFCDE.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train RFCDE object on training data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x_train</strong> (<em>numpy array/matrix</em>) – The training covariates. Each value/row corresponds to an
+observation.</li>
+<li><strong>z_train</strong> (<em>numpy array/matrix</em>) – The training responses. Each value/row corresponds to an
+observation.</li>
+<li><strong>fit_oob</strong> (<em>boolean</em>) – Whether to fit out-of-bag observations.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfcde.core.RFCDE.weights">
+<code class="descname">weights</code><span class="sig-paren">(</span><em>x_new</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rfcde/core.html#RFCDE.weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfcde.core.RFCDE.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate weights from forest tree structure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x_test</strong> (<em>numpy array</em>) – A new observation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The weights of each training point for the new observation.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">RFCDE</a></h1>
+
+
+
+<p class="blurb">Random Forests for Conditional Density Estimation</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=tpospisi&repo=RFCDE&type=fork&count=False&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a href="https://travis-ci.org/tpospisi/RFCDE">
+    <img
+        alt="https://secure.travis-ci.org/tpospisi/RFCDE.svg?branch=master"
+        src="https://secure.travis-ci.org/tpospisi/RFCDE.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">RFCDE</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-rfcde.core">rfcde.core</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Taylor Pospisil.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
