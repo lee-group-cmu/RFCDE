@@ -15,13 +15,8 @@ ext_modules = cythonize([
                                'src/rfcde/Node.cpp',
                                'src/rfcde/Split.cpp',
                                'src/rfcde/helpers.cpp'],
-                    libraries = ['src/rfcde/Forest.h'
-                                 'src/rfcde/Tree.h',
-                                 'src/rfcde/Node.h',
-                                 'src/rfcde/Split.h',
-                                 'src/rfcde/helpers.h'],
                     extra_compile_args = ['-std=c++11'],
-                    include_dirs = [np.get_include()],
+                    include_dirs = [np.get_include(), "src/rfcde/"],
                     language='c++')])
 
 for e in ext_modules:
