@@ -18,7 +18,7 @@ def test_joint_densities_run():
     mtry = 2
     min_size = 20
     n_basis = 15
-    bandwidth = 0.1
+    bandwidth = [0.1, 0.1]
 
     forest = rfcde.RFCDE(n_trees, mtry, min_size, n_basis)
     forest.train(x_train, z_train)

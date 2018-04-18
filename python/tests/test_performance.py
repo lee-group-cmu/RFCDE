@@ -30,7 +30,6 @@ def cde_loss(cdes, z_grid, true_z):
     nns = [np.argmin(np.abs(z_grid - true_z[ii])) for ii in range(n_obs)]
     term2 = np.mean(cdes[range(n_obs), nns])
     return term1 - 2 * term2
-    pass
 
 def test_beta_example_performance():
     def generate_data(n):

@@ -164,8 +164,12 @@ class RFCDE(object):
         z_grid : numpy array/matrix
            The grid points at which to estimate the conditional
            densities.
-        bandwidth : float
-           The bandwidth for the kernel density estimates.
+        bandwidth : float or string
+           The bandwidth for the kernel density estimates. For
+           automatic bandwidth selection use "normal_reference",
+           "cv_ml", and "cv_ls" for reference, maximum likelihood
+           cross validation, and least-squares cross validation
+           respectively.
 
         Returns
         -------
