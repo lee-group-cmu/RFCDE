@@ -1,3 +1,6 @@
+// Copyright Taylor Pospisil 2018.
+// Distributed under MIT License (http://opensource.org/licenses/MIT)
+
 #include <random>
 #include "Forest.h"
 #include "Tree.h"

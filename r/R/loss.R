@@ -1,3 +1,6 @@
+# Copyright Taylor Pospisil 2018.
+# Distributed under MIT License (http://opensource.org/licenses/MIT)
+
 #' Calculate loss for a single kernel density estimate
 #'
 #' @param weights A vector of weights for the training points.

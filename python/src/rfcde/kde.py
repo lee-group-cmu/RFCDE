@@ -1,5 +1,8 @@
 """Functions for weighted kernel density estimation."""
 
+# Copyright Taylor Pospisil 2018.
+# Distributed under MIT License (http://opensource.org/licenses/MIT)
+
 import numpy as np
 import statsmodels.api as sm
 import scipy.stats

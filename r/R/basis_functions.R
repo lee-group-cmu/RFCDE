@@ -1,3 +1,6 @@
+# Copyright Taylor Pospisil 2018.
+# Distributed under MIT License (http://opensource.org/licenses/MIT)
+
 #' Calculate basis functions for new observations
 #'
 #' @param z matrix whose row correspond to observations and whose

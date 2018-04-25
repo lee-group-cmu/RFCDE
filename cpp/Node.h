@@ -1,3 +1,6 @@
+// Copyright Taylor Pospisil 2018.
+// Distributed under MIT License (http://opensource.org/licenses/MIT)
+
 #ifndef NODE_GUARD
 #define NODE_GUARD
 #include <algorithm>

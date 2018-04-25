@@ -1,3 +1,6 @@
+# Copyright Taylor Pospisil 2018.
+# Distributed under MIT License (http://opensource.org/licenses/MIT)
+
 #' Helper function for kernel density estimation.
 #'
 #' @param z_train matrix of training responses.

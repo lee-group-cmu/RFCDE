@@ -1,5 +1,8 @@
 """Functions for evaluation of orthogonal basis functions."""
 
+# Copyright Taylor Pospisil 2018.
+# Distributed under MIT License (http://opensource.org/licenses/MIT)
+
 import numpy as np
 
 def evaluate_basis(responses, n_basis, basis_system):

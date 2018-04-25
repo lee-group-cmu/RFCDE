@@ -1,3 +1,6 @@
+# Copyright Taylor Pospisil 2018.
+# Distributed under MIT License (http://opensource.org/licenses/MIT)
+
 #' Project from [z_min, z_max] to [0, 1].
 #'
 #' @param z A vector of grid points to project
