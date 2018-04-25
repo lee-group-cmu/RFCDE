@@ -1,0 +1,86 @@
+---
+title: "Multiple Responses"
+author: "Taylor Pospisil"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+RFCDE extends to multiple response variables to estimate joint
+conditional densities. Consider data from the following model
+
+\begin{eqnarray}
+X &\sim& U(0, 1) \\
+Z_{1} &\sim& U(0, X) \\
+Z_{2} &\sim& U(X, Z_{1})
+\end{eqnarray}
+
+This exhibits dependence not only between the responses and the
+covariates, but also between the responses themselves. Thus merely
+estimating the univariate conditional densities would lose the
+information about the dependence between $Z_{1}$ and $Z_{2}$.
+
+```{r}
+library(RFCDE)
+set.seed(42)
+
+generate_data <- function(n) {
+  x <- runif(n)
+  z1 <- runif(n, 0, x)
+  z2 <- runif(n, z1, x)
+
+  return(list(x = x, z = cbind(z1, z2)))
+}
+
+n_train <- 10000
+
+train_data <- generate_data(n_train)
+x_train <- train_data$x
+z_train <- train_data$z
+```
+
+## Training
+
+Training is the same as for the univariate case. A tensor basis is
+used for the density estimates at each node; you can specify the
+number of basis functions for each dimension or just specify a single
+number which is applied to every dimension. Note that this scales like
+$n^d$ for $n$ basis functions in $d$ dimensions.
+
+```{r}
+n_trees <- 100
+mtry <- 1
+node_size <- 20
+n_basis <- c(15, 15)
+
+forest <- RFCDE(x_train, z_train, n_trees = n_trees, mtry = mtry,
+                node_size = node_size, n_basis = n_basis)
+```
+
+## Prediction
+
+Prediction requires a multivariate grid of points at which to evaluate
+the density. Bandwidths can be specified by a covariance matrix, a
+float (which scales the identity covariance) or a string (see
+documentation for details).
+
+```{r}
+n_grid <- 30
+z_grid <- expand.grid(z1 = seq(0, 1, length.out = n_grid),
+                      z2 = seq(0, 1, length.out = n_grid))
+density <- predict(forest, c(0.3), z_grid, bandwidth = "auto")
+
+image(seq(0, 1, length.out = n_grid), xlab = "Z1",
+      seq(0, 1, length.out = n_grid), ylab = "Z2",
+      z = matrix(density, n_grid, n_grid))
+```

@@ -1,0 +1,84 @@
+---
+title: "RFCDE"
+author: "Taylor Pospisil"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Random forests is a common non-parametric regression technique which
+performs well for mixed-type data and irrelevant covariates, while
+being robust to monotonic variable transformations. RFCDE fits random
+forest models optimized for nonparametric conditional density
+estimation.
+
+## Example
+
+```{r}
+library(RFCDE)
+set.seed(42)
+
+generate_data <- function(n) {
+  x_relevant <- matrix(runif(n * 10), n, 10)
+  x_irrelevant <- matrix(runif(n * 10), n, 10)
+  z <- rnorm(n, rowSums(x_relevant), 1)
+  return(list(x = cbind(x_relevant, x_irrelevant), z = z))
+}
+
+n_train <- 10000
+n_test <- 4
+
+train_data <- generate_data(n_train)
+x_train <- train_data$x
+z_train <- train_data$z
+```
+
+### Training
+
+Trees are recursively partitioned to minimize the CDE loss
+
+$$ \int \int (\hat{f}(x \mid z) - f(x \mid z))^{2} dz dP(x) $$
+
+This is efficiently calculated using an orthogonal series
+representation of the conditional densities. The resolution of this
+representation is controlled by `n_basis`.
+
+```{r}
+n_trees <- 1000
+mtry <- 4
+node_size <- 20
+n_basis <- 15
+
+forest <- RFCDE(x_train, z_train, n_trees = n_trees, mtry = mtry,
+                node_size = node_size, n_basis = n_basis)
+```
+
+### Prediction
+
+We use the forest structure to determine weights for a weighted kernel
+density estimate. The `predict` function evaluates this density on the
+provided grid.
+
+```{r}
+bandwidth <- 0.2
+n_grid <- 100
+z_grid <- seq(0, 10, length.out = n_grid)
+x_test <- generate_data(1)$x
+
+density <- predict(forest, x_test, z_grid, bandwidth = bandwidth)
+```
+
+```{r}
+plot(z_grid, density, type = "l", col = "green")
+lines(z_grid, dnorm(z_grid, sum(x_test[1:10]), 1))
+```
