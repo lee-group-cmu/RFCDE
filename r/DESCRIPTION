@@ -9,7 +9,7 @@ Description: Fits random forest conditional density estimates using
 URL: https://github.com/tpospisi/RFCDE/tree/master/r
 BugReports: https://github.com/tpospisi/RFCDE/issues
 License: MIT + file LICENSE
-Depends: R (>= 3.4.2)
+Depends: R (>= 3.4.0)
 Imports: Rcpp (>= 0.12.15),
     ks,
     methods
