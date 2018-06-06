@@ -13,12 +13,15 @@ kde_estimate <- function(z_train, z_grid, weights, bandwidth = "auto") {
   bandwidth <- select_bandwidth(z_train, weights, bandwidth)
 
   if (ncol(z_train) == 1) {
-    return(ks::kde(z_train, h = bandwidth,
-                   eval.points = z_grid, w = weights)$estimate)
+    estimates <- ks::kde(z_train, h = bandwidth,
+                         eval.points = z_grid, w = weights)$estimate
   } else {
-    return(ks::kde(z_train, H = bandwidth,
-                   eval.points = z_grid, w = weights)$estimate)
+    estimates <- ks::kde(z_train, H = bandwidth,
+                         eval.points = z_grid, w = weights)$estimate
   }
+
+  return(pmax(0.0, estimates)) # sometimes density is numerically less
+                               # than zero
 }
 
 #' Helper function for selecting bandwidth for KDE
