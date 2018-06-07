@@ -5,7 +5,6 @@
 
 import numpy as np
 import statsmodels.api as sm
-import scipy.stats
 
 def kde(responses, grid, weights, bandwidth):
     """Calculates the weighted kernel density estimate.
