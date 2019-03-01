@@ -67,6 +67,8 @@ class RFCDE(object):
        The training responses. Each value/row corresponds to an observation.
     fit_oob: boolean
        Whether the forest has fit out-of-bag samples.
+    n_var : integer
+       Number of training covariates
     forest : ForestWrapper
        Wrapped C++ forest
 
@@ -103,6 +105,7 @@ class RFCDE(object):
         if len(z_train.shape) == 1:
             z_train = z_train.reshape((len(z_train), 1))
 
+        self.n_var = x_train.shape[1]
         self.z_train = z_train
 
         z_min = z_train.min(0)
@@ -133,6 +136,8 @@ class RFCDE(object):
         numpy array
             The weights of each training point for the new observation.
         """
+        if len(x_new.shape) != 1 or len(x_new) != self.n_var:
+            raise ValueError("x_new must have same dimensions as x_train")
         return self.forest.weights(x_new)
 
     def oob_weights(self):
