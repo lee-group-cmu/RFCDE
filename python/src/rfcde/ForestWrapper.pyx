@@ -113,6 +113,6 @@ cdef class ForestWrapper:
         self.Cpp_Class.fill_oob_weights(&wt_mat[0,0])
 
     def oob_weights(self):
-        wt_mat = np.zeros(self.n_train, self.n_train, dtype=int, order="F")
+        wt_mat = np.zeros((self.n_train, self.n_train), dtype=int, order="F")
         self.fill_oob_weights(wt_mat)
         return wt_mat
