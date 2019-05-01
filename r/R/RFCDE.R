@@ -19,7 +19,7 @@
 #'   samples increase the computation time but allows for estimation
 #'   of the prediction loss. Defaults to FALSE.
 #' @export
-RFCDE <- function(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)),
+RFCDE <- function(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)), #nolint
                   node_size = 5, n_basis = 31, basis_system = "cosine",
                   min_loss_delta = 0.0,  fit_oob = FALSE) {
   x_train <- as.matrix(x_train)
@@ -67,7 +67,7 @@ summary.RFCDE <- function(x, ...) {
 #'
 #' @param x A RFCDE object.
 #' @param ... Other arguments to format
-format.RFCDE <- function(x, ...) {
+format.RFCDE <- function(x, ...) { #nolint
   return(c("RFCDE object:",
            paste("n_train =", nrow(x$z_train)),
            paste("OOB =", x$fit_oob)))
@@ -87,7 +87,7 @@ format.RFCDE <- function(x, ...) {
 #'   leaf nodes of the forest.
 #' @importFrom stats weights
 #' @export
-weights.RFCDE <- function(object, newdata, ...) {
+weights.RFCDE <- function(object, newdata, ...) { #nolint
   if (is.vector(newdata)) {
     if (length(newdata) == object$n_x) {
       newdata <- matrix(newdata, nrow = 1)
@@ -128,17 +128,20 @@ oob_weights <- function(forest) {
 #'
 #' @param object a RFCDE object.
 #' @param newdata matrix of test covariates.
+#' @param response the type of response to predict; "CDE" for full
+#' conditional densities, "mean" for conditional means, "quantile"
+#' for conditional quantiles.
 #' @param z_grid grid points at which to evaluate the kernel density.
 #' @param bandwidth (optional) bandwidth for kernel density estimates.
 #'   Defaults to "auto" for automatic bandwidth selection.
+#' @param quantile (optional) quantile to estimate
 #' @param \dots additional arguments
 #' @importFrom stats predict
 #' @export
-predict.RFCDE <- function(object, newdata, z_grid, bandwidth = "auto", ...) {
-  n_train <- nrow(object$z_train)
-  n_dim <- ncol(object$z_train)
-  stopifnot(ncol(z_grid) == n_dim)
-
+predict.RFCDE <- function(object, newdata,
+                          response = c("CDE", "mean", "quantile"),
+                          z_grid = NULL, bandwidth = "auto", quantile = NULL,
+                          ...) {
   if (is.vector(newdata)) {
     if (length(newdata) == object$n_x) {
       newdata <- matrix(newdata, nrow = 1)
@@ -151,21 +154,47 @@ predict.RFCDE <- function(object, newdata, z_grid, bandwidth = "auto", ...) {
 
   stopifnot(is.matrix(newdata))
   stopifnot(ncol(newdata) == object$n_x)
-  if (!is.matrix(z_grid)) {
-    z_grid <- as.matrix(z_grid)
-  }
 
   n_test <- nrow(newdata)
+  n_train <- nrow(object$z_train)
+  n_dim <- ncol(object$z_train)
 
-  cde <- matrix(NA, n_test, nrow(z_grid))
-  wts <- rep(0L, n_train)
-  for (ii in seq_len(n_test)) {
-    wts <- weights(object, newdata[ii, , drop = FALSE]) #nolint
-    wts <- wts * n_train / sum(wts)
-    cde[ii, ] <- kde_estimate(object$z_train, z_grid, wts, bandwidth)
+  if (response == "CDE") {
+    if (!is.matrix(z_grid)) {
+      z_grid <- as.matrix(z_grid)
+    }
+    stopifnot(ncol(z_grid) == n_dim)
+
+    cde <- matrix(NA, n_test, nrow(z_grid))
+    wts <- rep(0L, n_train)
+    for (ii in seq_len(n_test)) {
+      wts <- weights(object, newdata[ii, , drop = FALSE]) #nolint
+      wts <- wts * n_train / sum(wts)
+      cde[ii, ] <- kde_estimate(object$z_train, z_grid, wts, bandwidth)
+    }
+    return(cde)
+  } else if (response == "mean") {
+    means <- rep(NA, n_test)
+    wts <- rep(0L, n_train)
+    for (ii in seq_len(n_test)) {
+      wts <- weights(object, newdata[ii, , drop = FALSE]) #nolint
+      wts <- wts * n_train / sum(wts)
+      means[ii] <- weighted.mean(object$z_train, wts)
+    }
+    return(means)
+  } else if (response == "quantile") {
+    quantiles <- rep(NA, n_test)
+    wts <- rep(0L, n_train)
+    for (ii in seq_len(n_test)) {
+      wts <- weights(object, newdata[ii, , drop = FALSE]) #nolint
+      wts <- wts * n_train / sum(wts)
+      quantiles[ii] <- Hmisc::wtd.quantile(object$z_train, weights = wts,
+                                           probs = quantile)
+    }
+    return(quantiles)
+  } else {
+      stop("Response type not recognized")
   }
-
-  return(cde)
 }
 
 #' Calculate variable importance measures for RFCDE.

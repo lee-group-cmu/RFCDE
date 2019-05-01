@@ -78,7 +78,7 @@ documentation for details).
 n_grid <- 30
 z_grid <- expand.grid(z1 = seq(0, 1, length.out = n_grid),
                       z2 = seq(0, 1, length.out = n_grid))
-density <- predict(forest, c(0.3), z_grid, bandwidth = "auto")
+density <- predict(forest, c(0.3), "CDE", z_grid, bandwidth = "auto")
 
 image(seq(0, 1, length.out = n_grid), xlab = "Z1",
       seq(0, 1, length.out = n_grid), ylab = "Z2",

@@ -22,7 +22,7 @@ test_that("Loss estimates match integrals", {
   forest <- RFCDE(x_train, z_train, n_trees, mtry, min_size, n_basis)
 
   z_grid <- seq(-4, 4, length.out = n_grid)
-  cdes <- predict(forest, x_test, z_grid, bandwidth = bandwidth)
+  cdes <- predict(forest, x_test, "CDE", z_grid, bandwidth = bandwidth)
 
   expected <- cdetools::cde_loss(cdes, z_grid, z_test)$loss
 

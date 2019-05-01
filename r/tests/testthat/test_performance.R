@@ -27,7 +27,7 @@ test_that("Beta example performance", {
 
   n_grid <- 1000
   z_grid <- seq(0, 5.0, length.out = n_grid)
-  density <- predict(forest, x_test, z_grid, bandwidth = bandwidth)
+  density <- predict(forest, x_test, "CDE", z_grid, bandwidth = bandwidth)
   loss <- cdetools::cde_loss(density, z_grid, z_test)$loss
 
   expect_lt(loss, -1.8)

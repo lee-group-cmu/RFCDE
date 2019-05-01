@@ -16,7 +16,7 @@
 #' @importFrom methods new
 NULL
 
-.onUnload <- function (libpath) {
+.onUnload <- function(libpath) {
   library.dynam.unload("RFCDE", libpath)
 }
 

@@ -24,6 +24,8 @@ test_that("Prediction works for vectors", {
   x <- matrix(runif(n), n, 1)
   z <- matrix(runif(n), n, 1)
 
+  z_grid <- seq(0, 1, length.out = 100)
+
   n_trees <- 100
   mtry <- 2
   min_size <- 20
@@ -31,7 +33,6 @@ test_that("Prediction works for vectors", {
 
   forest <- RFCDE(x, z, n_trees, mtry, min_size, n_basis)
 
-  expect_silent(predict(forest, x, z[, 1]))
-  expect_silent(predict(forest, x[, 1], z))
-  expect_silent(predict(forest, x[, 1], z[, 1]))
+  expect_silent(predict(forest, x, "CDE", z_grid))
+  expect_silent(predict(forest, x[, 1], "CDE", z))
 })

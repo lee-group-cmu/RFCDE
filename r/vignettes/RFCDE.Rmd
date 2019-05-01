@@ -75,7 +75,7 @@ n_grid <- 100
 z_grid <- seq(0, 10, length.out = n_grid)
 x_test <- generate_data(1)$x
 
-density <- predict(forest, x_test, z_grid, bandwidth = bandwidth)
+density <- predict(forest, x_test, "CDE", z_grid, bandwidth = bandwidth)
 ```
 
 ```{r}

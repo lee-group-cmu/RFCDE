@@ -9,7 +9,9 @@ import numpy as np
 
 from .basis_functions import evaluate_basis
 from .kde import kde
+from .weighted_quantile import weighted_quantile
 from .ForestWrapper import ForestWrapper
+
 
 # Helper function
 def _box(responses, box_min, box_max):
@@ -30,6 +32,7 @@ def _box(responses, box_min, box_max):
        responses projected onto [0, 1].
     """
     return (responses - box_min) / (box_max - box_min)
+
 
 class RFCDE(object):
     """Object for RFCDE.
@@ -73,8 +76,14 @@ class RFCDE(object):
        Wrapped C++ forest
 
     """
-    def __init__(self, n_trees, mtry, node_size, min_loss_delta=0.0,
-                 n_basis=15, basis_system='cosine'):
+
+    def __init__(self,
+                 n_trees,
+                 mtry,
+                 node_size,
+                 min_loss_delta=0.0,
+                 n_basis=15,
+                 basis_system='cosine'):
         self.n_trees = n_trees
         self.mtry = mtry
         self.node_size = node_size
@@ -84,7 +93,7 @@ class RFCDE(object):
         self.basis_system = basis_system
         self.forest = ForestWrapper()
 
-    def train(self, x_train, z_train, fit_oob = False):
+    def train(self, x_train, z_train, fit_oob=False):
         """Train RFCDE object on training data.
 
         Arguments
@@ -111,16 +120,17 @@ class RFCDE(object):
         z_min = z_train.min(0)
         z_max = z_train.max(0)
         if self.mtry > x_train.shape[1]:
-            warn("mtry larger than number of covariates; \
+            warn(
+                "mtry larger than number of covariates; \
             setting mtry to number of covariates", RuntimeWarning)
             self.mtry = x_train.shape[1]
 
         z_basis = evaluate_basis(_box(z_train, z_min, z_max), self.n_basis,
                                  self.basis_system)
 
-        self.forest.train(np.asfortranarray(x_train), np.asfortranarray(z_basis),
-                          self.n_trees, self.mtry, self.node_size,
-                          self.min_loss_delta, fit_oob)
+        self.forest.train(np.asfortranarray(x_train),
+                          np.asfortranarray(z_basis), self.n_trees, self.mtry,
+                          self.node_size, self.min_loss_delta, fit_oob)
         self.fit_oob = fit_oob
 
     def weights(self, x_new):
@@ -200,3 +210,57 @@ class RFCDE(object):
             weights = self.weights(np.ascontiguousarray(x_new[idx, :]))
             cde[idx, :] = kde(self.z_train, z_grid, weights, bandwidth)
         return cde
+
+    def predict_mean(self, x_new):
+        """Calculate conditional mean estimate for new observations.
+
+        Arguments
+        ---------
+        x_new : numpy array/matrix
+           The covariates for the new observations. Each row/value
+           corresponds to an observation. Must have the same
+           dimensionality as the training covariates.
+
+        Returns
+        -------
+        numpy array
+           An array of conditional mean estimates.
+        """
+        # Coerce to matrix
+        if len(x_new.shape) == 1:
+            x_new = x_new.reshape((1, len(x_new)))
+
+        n_test = x_new.shape[0]
+        means = np.zeros(n_test)
+        for idx in range(n_test):
+            weights = self.weights(np.ascontiguousarray(x_new[idx, :]))
+            means[idx] = np.average(self.z_train, weights=weights)
+        return means
+
+    def predict_quantile(self, x_new, quantile):
+        """Calculate conditional quantile estimate for new observations.
+
+        Arguments
+        ---------
+        x_new : numpy array/matrix
+           The covariates for the new observations. Each row/value
+           corresponds to an observation. Must have the same
+           dimensionality as the training covariates.
+        quantile : float
+           The quantile to estimate (between 0 and 1).
+
+        Returns
+        -------
+        numpy array
+           An array of conditional quantile estimates.
+        """
+        # Coerce to matrix
+        if len(x_new.shape) == 1:
+            x_new = x_new.reshape((1, len(x_new)))
+
+        n_test = x_new.shape[0]
+        quantiles = np.zeros(n_test)
+        for idx in range(n_test):
+            weights = self.weights(np.ascontiguousarray(x_new[idx, :]))
+            quantiles[idx] = weighted_quantile(self.z_train, weights, quantile)
+        return quantiles
