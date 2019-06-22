@@ -11,7 +11,8 @@ test_that("Node size is respected", {
   mtry <- 1
   n_basis <- 15
   for (min_size in c(1, 2, 3, 10, 100)) {
-    forest <- RFCDE(x, z, n_trees, mtry, min_size, n_basis)
+    forest <- RFCDE(x, z, n_trees = n_trees, mtry = mtry, node_size = min_size,
+                    n_basis = n_basis)
     expect_gte(sum(weights(forest, x[1, ])), min_size)
   }
 })
@@ -27,7 +28,8 @@ test_that("Binary splits are respected", {
   mtry <- 1
   min_size <- 20
   n_basis <- 15
-  forest <- RFCDE(x, z, n_trees, mtry, min_size, n_basis)
+  forest <- RFCDE(x, z, n_trees = n_trees, mtry = mtry, node_size = min_size,
+                  n_basis = n_basis)
   wts1 <- weights(forest, matrix(1))
   wts2 <- weights(forest, matrix(2))
 
