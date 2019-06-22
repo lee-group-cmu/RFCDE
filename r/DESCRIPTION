@@ -22,5 +22,5 @@ Suggests: testthat,
     rmarkdown
 RcppModules: RFCDEModule
 Remotes:
-    tpospisi/cdetools
+    tpospisi/cdetools/r
 VignetteBuilder: knitr
