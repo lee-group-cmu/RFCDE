@@ -2,6 +2,7 @@ import numpy as np
 import rfcde
 import pytest
 
+
 def cde_loss(cdes, z_grid, true_z):
     """Calculates conditional density estimation loss on holdout data
 
@@ -25,11 +26,12 @@ def cde_loss(cdes, z_grid, true_z):
     """
     n_obs, _ = cdes.shape
 
-    term1 = np.mean(np.trapz(cdes ** 2, z_grid))
+    term1 = np.mean(np.trapz(cdes**2, z_grid))
 
     nns = [np.argmin(np.abs(z_grid - true_z[ii])) for ii in range(n_obs)]
     term2 = np.mean(cdes[range(n_obs), nns])
     return term1 - 2 * term2
+
 
 def test_beta_example_performance():
     def generate_data(n):
@@ -46,7 +48,10 @@ def test_beta_example_performance():
     n_basis = 15
     bandwidth = 0.1
 
-    forest = rfcde.RFCDE(n_trees, mtry, min_size, n_basis)
+    forest = rfcde.RFCDE(n_trees=n_trees,
+                         mtry=mtry,
+                         node_size=min_size,
+                         n_basis=n_basis)
     forest.train(x_train, z_train)
 
     n_grid = 1000

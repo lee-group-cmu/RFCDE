@@ -13,8 +13,9 @@ cdef extern from "Forest.h":
 
         # Methods
         void train(double* x_train, double* z_basis,
-                   int n_train, int n_var, int n_basis, int n_trees, int mtry,
-                   int node_size, double min_loss_delta, bool fit_oob)
+                   int* lens, int n_train, int n_var, int n_basis, int n_trees, int mtry,
+                   int node_size, double min_loss_delta, double flambda,
+                   bool fit_oob)
         void fill_weights(double* x_test, long* wt_buf);
         void fill_oob_weights(long* wt_mat);
 
@@ -43,9 +44,10 @@ cdef class ForestWrapper:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     def train(self, np.ndarray[double, ndim=2, mode="fortran"] x_train,
-              np.ndarray[double, ndim=2, mode="fortran"] z_basis, long n_trees,
-              long mtry, long node_size, double min_loss_delta,
-              bool fit_oob=False):
+              np.ndarray[double, ndim=2, mode="fortran"] z_basis,
+              np.ndarray[int, ndim=1, mode="c"] lens,
+              long n_trees, long mtry, long node_size, double min_loss_delta,
+              double flambda, bool fit_oob=False):
         """Trains RFCDE on training data.
 
         Arguments
@@ -57,6 +59,8 @@ cdef class ForestWrapper:
             column corresponds to a basis function, each row
             corresponds to an observation. Must be stored in "fortran"
             mode.
+        lens : numpy array
+            The length of each functional variable.
         n_trees : integer
             The number of trees to train.
         mtry : integer
@@ -65,6 +69,8 @@ cdef class ForestWrapper:
             The minimum number of observations in each leaf node.
         min_loss_delta: float
             The minimum change in loss for a split.
+        flambda : float
+            The functional splitting parameter
         fit_oob : boolean
             Whether to fit out-of-bag samples. Defaults to False.
         """
@@ -78,7 +84,7 @@ cdef class ForestWrapper:
         cdef int node_size_i = node_size;
 
         # Pass in pointers of numpy matrices/arrays
-        self.Cpp_Class.train(&x_train[0,0], &z_basis[0,0], n_train, n_var, n_basis, n_trees_i, mtry_i, node_size_i, min_loss_delta, fit_oob)
+        self.Cpp_Class.train(&x_train[0,0], &z_basis[0,0], &lens[0], n_train, n_var, n_basis, n_trees_i, mtry_i, node_size_i, min_loss_delta, flambda, fit_oob)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)

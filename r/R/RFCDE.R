@@ -5,6 +5,7 @@
 #'
 #' @param x_train a matrix of training covariates.
 #' @param z_train a matrix of training responses.
+#' @param lens length of functional data
 #' @param n_trees the number of trees in the forest. Defaults to 1000.
 #' @param mtry the number of candidate variables to try for each
 #'   split. Defaults to the square root of the number of covariates.
@@ -19,21 +20,24 @@
 #'   samples increase the computation time but allows for estimation
 #'   of the prediction loss. Defaults to FALSE.
 #' @export
-RFCDE <- function(x_train, z_train, n_trees = 1000, mtry = sqrt(ncol(x_train)), #nolint
+RFCDE <- function(x_train, z_train, lens = rep(1L, ncol(x_train)), #nolint
+                  n_trees = 1000, mtry = sqrt(ncol(x_train)),
                   node_size = 5, n_basis = 31, basis_system = "cosine",
-                  min_loss_delta = 0.0,  fit_oob = FALSE) {
+                  min_loss_delta = 0.0, flambda = 1.0, fit_oob = FALSE) {
   x_train <- as.matrix(x_train)
   z_train <- as.matrix(z_train)
 
   mtry <- min(mtry, ncol(x_train))
+
+  stopifnot(sum(lens) == ncol(x_train))
 
   z_min <- apply(z_train, 2, min)
   z_max <- apply(z_train, 2, max)
   z_basis <- evaluate_basis(box(z_train, z_min, z_max), n_basis, basis_system)
 
   forest <- methods::new(ForestRcpp)
-  forest$train(x_train, z_basis, n_trees, mtry, node_size,
-               min_loss_delta, fit_oob)
+  forest$train(x_train, z_basis, lens, n_trees, mtry, node_size,
+               min_loss_delta, flambda, fit_oob)
 
   x_names <- colnames(x_train)
   if (is.null(x_names)) {

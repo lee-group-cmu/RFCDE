@@ -72,6 +72,8 @@ class RFCDE(object):
        Whether the forest has fit out-of-bag samples.
     n_var : integer
        Number of training covariates
+    lens : numpy array
+       The lengths of functional variables; scalar variables will have a length of 1.
     forest : ForestWrapper
        Wrapped C++ forest
 
@@ -91,9 +93,10 @@ class RFCDE(object):
         self.n_basis = n_basis
         self.z_train = None
         self.basis_system = basis_system
+        self.lens = None
         self.forest = ForestWrapper()
 
-    def train(self, x_train, z_train, fit_oob=False):
+    def train(self, x_train, z_train, lens=None, flambda=1.0, fit_oob=False):
         """Train RFCDE object on training data.
 
         Arguments
@@ -104,6 +107,11 @@ class RFCDE(object):
         z_train : numpy array/matrix
            The training responses. Each value/row corresponds to an
            observation.
+        lens : numpy array
+           The lengths of functional variables. Defaults to treating
+           each variable as a scalar.
+        flambda : float
+           The functional splitting parameter
         fit_oob : boolean
            Whether to fit out-of-bag observations.
 
@@ -117,6 +125,11 @@ class RFCDE(object):
         self.n_var = x_train.shape[1]
         self.z_train = z_train
 
+        if not lens:
+            lens = np.array([1] * self.n_var, dtype=np.intc)
+        if lens.dtype != np.intc:
+            lens = lens.astype(np.cint)
+
         z_min = z_train.min(0)
         z_max = z_train.max(0)
         if self.mtry > x_train.shape[1]:
@@ -129,8 +142,9 @@ class RFCDE(object):
                                  self.basis_system)
 
         self.forest.train(np.asfortranarray(x_train),
-                          np.asfortranarray(z_basis), self.n_trees, self.mtry,
-                          self.node_size, self.min_loss_delta, fit_oob)
+                          np.asfortranarray(z_basis), np.asfortranarray(lens),
+                          self.n_trees, self.mtry, self.node_size,
+                          self.min_loss_delta, flambda, fit_oob)
         self.fit_oob = fit_oob
 
     def weights(self, x_new):
