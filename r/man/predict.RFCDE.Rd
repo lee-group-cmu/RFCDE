@@ -4,17 +4,23 @@
 \alias{predict.RFCDE}
 \title{Predict conditional density estimates for RFCDE objects.}
 \usage{
-\method{predict}{RFCDE}(object, newdata, z_grid, bandwidth, ...)
+\method{predict}{RFCDE}(object, newdata, response, ...)
 }
 \arguments{
 \item{object}{a RFCDE object.}
 
 \item{newdata}{matrix of test covariates.}
 
-\item{z_grid}{grid points at which to evaluate the kernel density.}
+\item{response}{the type of response to predict; "CDE" for full
+conditional densities, "mean" for conditional means, "quantile"
+for conditional quantiles.}
+
+\item{z_grid}{(optional) grid points at which to evaluate the kernel density.}
 
 \item{bandwidth}{(optional) bandwidth for kernel density estimates.
 Defaults to "auto" for automatic bandwidth selection.}
+
+\item{quantile}{(optional) quantile to estimate}
 
 \item{\dots}{additional arguments}
 }
