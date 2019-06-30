@@ -15,12 +15,11 @@ Imports: Rcpp (>= 0.12.15),
     methods,
     Hmisc
 LinkingTo: Rcpp
-RoxygenNote: 6.1.0
+RoxygenNote: 6.0.1
 Suggests: testthat,
     cdetools,
     knitr,
-    rmarkdown,
-    lintr
+    rmarkdown
 RcppModules: RFCDEModule
 Remotes:
     tpospisi/cdetools/r

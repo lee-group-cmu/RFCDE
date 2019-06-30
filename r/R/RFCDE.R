@@ -16,7 +16,6 @@
 #' @param basis_system the system of basis functions to use; currently
 #'   "cosine" and "Haar" are supported. Defaults to "cosine"
 #' @param min_loss_delta the minimum loss for a split. Defaults to 0.0.
-#' @param flambda the functional splitting parameter.
 #' @param fit_oob whether to fit out-of-bag samples or not. Out-of-bag
 #'   samples increase the computation time but allows for estimation
 #'   of the prediction loss. Defaults to FALSE.
@@ -129,14 +128,14 @@ oob_weights <- function(forest) {
 
 #' Predict conditional density estimates for RFCDE objects.
 #'
-#' @usage \method{predict}{RFCDE}(object, newdata, response, ...)
+#' @usage \method{predict}{RFCDE}(object, newdata, z_grid, bandwidth, ...)
 #'
 #' @param object a RFCDE object.
 #' @param newdata matrix of test covariates.
 #' @param response the type of response to predict; "CDE" for full
 #' conditional densities, "mean" for conditional means, "quantile"
 #' for conditional quantiles.
-#' @param z_grid (optional) grid points at which to evaluate the kernel density.
+#' @param z_grid grid points at which to evaluate the kernel density.
 #' @param bandwidth (optional) bandwidth for kernel density estimates.
 #'   Defaults to "auto" for automatic bandwidth selection.
 #' @param quantile (optional) quantile to estimate

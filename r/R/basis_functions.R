@@ -93,7 +93,7 @@ cosine_basis <- function(z, n_basis) {
 }
 
 #' Evaluates Haar mother wavlet
-#' @param x float, value at which to evaluate the wavlet
+#' @param x: float, value at which to evaluate the wavlet
 #' @return float; the Haar mother wavlet evaluated at x
 .haar_phi <- function(x) {
   if (0 <= x && x < 0.5) {

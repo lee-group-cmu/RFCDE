@@ -7,10 +7,11 @@
 #' @description Provides a wrapper to the C++ RFCDE implementation.
 #'
 #' @param x_train a matrix of training covariates.
-#' @param z_basis a matrix of basis functions evaluations for training responses.
+#' @param z_basis a matrix of basis evaluations for training responses.
 #' @param n_trees the number of trees in the forest.
 #' @param mtry the number of candidate variables to try for each split.
 #' @param node_size the minimum number of observations in a leaf node.
 #'
 #' @export ForestRcpp
 NULL
+
