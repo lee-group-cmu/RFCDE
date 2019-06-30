@@ -10,9 +10,9 @@ class Forest {
   std::vector<Tree> trees; // vector of trees in the forest
   bool fit_oob;
 
-  void train(double* x_train, double* z_basis,
+  void train(double* x_train, double* z_basis, int* lens,
              int n_train, int n_var, int n_basis, int n_trees, int mtry,
-             int node_size, double min_loss_delta, bool fit_oob);
+             int node_size, double min_loss_delta, double flambda, bool fit_oob);
 
   // Python uses longs for their integers; use template for easy
   // wrapping.

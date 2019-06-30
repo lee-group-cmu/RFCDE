@@ -23,7 +23,8 @@ test_that("Beta example performance", {
   n_basis <- 15
   bandwidth <- 0.1
 
-  forest <- RFCDE(x_train, z_train, n_trees, mtry, min_size, n_basis)
+  forest <- RFCDE(x_train, z_train, n_trees = n_trees, mtry = mtry,
+                  node_size = min_size, n_basis = n_basis)
 
   n_grid <- 1000
   z_grid <- seq(0, 5.0, length.out = n_grid)

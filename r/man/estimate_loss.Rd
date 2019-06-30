@@ -4,8 +4,8 @@
 \alias{estimate_loss}
 \title{Estimate loss for RFCDE}
 \usage{
-estimate_loss(forest, bandwidth = "auto", method = "oob", x_test = NULL,
-  z_test = NULL)
+estimate_loss(forest, bandwidth = "auto", method = "oob",
+  x_test = NULL, z_test = NULL)
 }
 \arguments{
 \item{forest}{An RFCDE object}

@@ -12,11 +12,21 @@ class Tree {
   int n_train;
   std::vector<int> valid_idx;
   std::vector<int> wts;
+  std::vector<int> starts;
+  std::vector<int> ends;
 
-  void train(double* x_train, double* z_basis, const std::vector<int>& weights,
+  void train(double* x_train, double* z_basis, int* lens, const std::vector<int>& weights,
              int n_train, int n_var, int n_basis, int mtry, int node_size,
-             double min_loss_delta, bool fit_oob);
+             double min_loss_delta, double flambda, bool fit_oob);
   Node traverse(double* x_test);
+
+  double calculate_feature(double* x_test, int idx) {
+    double val = 0.0;
+    for (int ii = this -> starts[idx]; ii < this -> ends[idx]; ++ii) {
+      val += x_test[ii];
+    }
+    return val;
+  }
 
   // Use template since Python uses longs and R uses ints for their
   // integer types.
@@ -62,7 +72,6 @@ class Tree {
   };
 
 
-
   void update_loss_importance(double* scores, Node* current = NULL) {
     // Update variable importance counts
     //
@@ -82,12 +91,16 @@ class Tree {
     }
 
     if (!current -> is_leaf()) {
-      scores[current -> split_var] += current -> loss_delta;
+      int start = this -> starts[current -> split_var];
+      int end = this -> ends[current -> split_var];
+      for (int idx = start; idx < end; idx++) {
+        scores[idx] += current -> loss_delta / (end - start);
+      }
+
       update_loss_importance(scores, current -> le_child);
       update_loss_importance(scores, current -> gt_child);
     }
   };
-
 
   void update_count_importance(double* scores, Node* current = NULL) {
     // Update variable importance counts
@@ -105,7 +118,11 @@ class Tree {
     if (current == NULL) { current = &(this -> root); }
 
     if (!current -> is_leaf()) {
-      scores[current -> split_var] += 1.0;
+      int start = this -> starts[current -> split_var];
+      int end = this -> ends[current -> split_var];
+      for (int idx = start; idx < end; idx++) {
+        scores[idx] += 1.0 / (end - start);
+      }
       update_count_importance(scores, current -> le_child);
       update_count_importance(scores, current -> gt_child);
     }
