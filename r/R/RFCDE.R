@@ -179,7 +179,7 @@ predict.RFCDE <- function(object, newdata,
     for (ii in seq_len(n_test)) {
       wts <- weights(object, newdata[ii, , drop = FALSE]) #nolint
       wts <- wts * n_train / sum(wts)
-      means[ii] <- weighted.mean(object$z_train, wts)
+      means[ii] <- weighted.mean(object$z_train, t(wts))
     }
     return(means)
   } else if (response == "quantile") {
@@ -188,7 +188,7 @@ predict.RFCDE <- function(object, newdata,
     for (ii in seq_len(n_test)) {
       wts <- weights(object, newdata[ii, , drop = FALSE]) #nolint
       wts <- wts * n_train / sum(wts)
-      quantiles[ii] <- Hmisc::wtd.quantile(object$z_train, weights = wts,
+      quantiles[ii] <- Hmisc::wtd.quantile(object$z_train, weights = t(wts),
                                            probs = quantile)
     }
     return(quantiles)
