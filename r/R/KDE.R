@@ -6,10 +6,11 @@
 #' @param z_train matrix of training responses.
 #' @param z_grid matrix of grid points to evaluate densities.
 #' @param weights vector of weights.
-#' @param bandwidth (optional) Either "auto" for automatic bandwidth
-#'   selection or a fixed bandwidth value or matrix. Defaults to "auto".
+#' @param bandwidth (optional) Either "plugin" for bandwidth selection by
+#'     plug-in rule, "cv" for cross-validation, or a fixed bandwidth
+#'     value or matrix. Defaults to "plugin".
 #' @return A vector of the density estimated at z_grid
-kde_estimate <- function(z_train, z_grid, weights, bandwidth = "auto") {
+kde_estimate <- function(z_train, z_grid, weights, bandwidth = "plugin") {
   bandwidth <- select_bandwidth(z_train, weights, bandwidth)
 
   if (ncol(z_train) == 1) {
@@ -28,19 +29,34 @@ kde_estimate <- function(z_train, z_grid, weights, bandwidth = "auto") {
 #'
 #' @param z A matrix of training responses.
 #' @param weights A vector of weights for training points.
-#' @param method (optional) Either "auto" for automatic bandwidth
-#'   selection or a fixed bandwidth value or matrix. Defaults to "auto".
+#' @param method (optional) Either "plugin" for bandwidth selection by
+#'     plug-in rule, "cv" for cross-validation, or a fixed bandwidth
+#'     value or matrix. Defaults to "plugin".
 #' @return A bandwidth for KDE
-select_bandwidth <- function(z, weights, method = "auto") {
+select_bandwidth <- function(z, weights, method = "plugin") {
   if (!is.character(method)) {
     return(method)
   }
   w <- weights * sum(weights != 0) / sum(weights)
-  if (ncol(z) == 1) {
-    return(ks::hpi(z[rep(seq_along(weights), w), ]))
-  } else {
-    return(ks::Hpi(z[rep(seq_along(weights), w), ]))
+  rep_indices <- rep(seq_along(weights), w)
+  if (method == "auto") {
+      method <- "plugin"
+      warning("method=\"auto\" is deprecated; please use method=\"plugin\"")
   }
+  if (method == "plugin") {
+      if (ncol(z) == 1) {
+          return(ks::hpi(z[rep_indices, ]))
+      } else {
+          return(ks::Hpi(z[rep_indices, ]))
+      }
+  } else if (method == "cv") {
+      if (ncol(z) == 1) {
+          return(ks::hscv(z[rep_indices, ]))
+      } else {
+          return(ks::Hscv(z[rep_indices, ]))
+      }
+  }
+  stop(paste("method =", method, "not recognized"))
 }
 
 #' Select a constant bandwidth to minimize CDE loss
