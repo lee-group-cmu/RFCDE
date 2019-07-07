@@ -66,6 +66,51 @@ z_grid = np.linspace(0, 2, n_grid)
 density = forest.predict(x_test, z_grid, bandwidth)
 ```
 
+fRFCDE
+===
+
+Functional RFCDE (fRFCDE) is a variant of RFCDE which can efficiently handle functional input (https://arxiv.org/abs/1906.07177). In this variant, functional covariates are grouped together according to a Poisson process with parameter <sub>&lambda;</sub>.
+It is included within the _r_ and _python_ package and the parameter <sub>&lambda;</sub> can be set as follows:
+
+```python
+import numpy as np
+import rfcde
+
+# Parameters
+n_trees = 1000     # Number of trees in the forest
+mtry = 4           # Number of variables to potentially split at in each node
+node_size = 20     # Smallest node size
+n_basis = 15       # Number of basis functions
+bandwidth = 0.2    # Kernel bandwith - used for prediction only
+lambda_param = 10  # Poisson Process parameter
+
+# Fit the model
+functional_forest = rfcde.RFCDE(n_trees=n_trees, mtry=mtry, node_size=node_size, 
+                                n_basis=n_basis)
+functional_forest.train(x_train, y_train, flamba=lambda_param)
+
+# ... Same as RFCDE for prediction ...
+```
+
+```R
+library(RFCDE)
+
+# Parameters
+n_trees <- 1000     # Number of trees in the forest
+mtry <- 4           # Number of variables to potentially split at in each node
+node_size <- 20     # Smallest node size
+n_basis <- 15       # Number of basis functions
+bandwidth <- 0.2    # Kernel bandwith - used for prediction only
+lambda_param <- 10  # Poisson Process parameter
+
+# Fit the model
+functional_forest <- RFCDE::RFCDE(x_train, y_train, n_trees = n_trees, mtry = mtry, 
+                                  node_size = node_size, n_basis = n_basis, 
+                                  flambda = lambda_param)
+
+# ... Same as RFCDE for prediction ...
+```
+
 Citation
 ===
 
@@ -75,6 +120,12 @@ Citation
   author={Pospisil, Taylor and Lee, Ann B},
   journal={arXiv preprint arXiv:1804.05753},
   year={2018}
+}
+@article{pospisil2019(f)rfcde,
+title={(f)RFCDE: Random Forests for Conditional Density Estimation and Functional Data},
+author={Pospisil, Taylor and Lee, Ann B},
+journal={arXiv preprint arXiv:1906.07177},
+year={2019}
 }
 ```
 
