@@ -137,14 +137,14 @@ oob_weights <- function(forest) {
 #' for conditional quantiles.
 #' @param z_grid grid points at which to evaluate the kernel density.
 #' @param bandwidth (optional) bandwidth for kernel density estimates.
-#'   Defaults to "auto" for automatic bandwidth selection.
+#'   Defaults to "plugin" for plugin rule bandwidth selection.
 #' @param quantile (optional) quantile to estimate
 #' @param \dots additional arguments
 #' @importFrom stats predict
 #' @export
 predict.RFCDE <- function(object, newdata,
                           response = c("CDE", "mean", "quantile"),
-                          z_grid = NULL, bandwidth = "auto", quantile = NULL,
+                          z_grid = NULL, bandwidth = "plugin", quantile = NULL,
                           ...) {
   if (is.vector(newdata)) {
     if (length(newdata) == object$n_x) {
