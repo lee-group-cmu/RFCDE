@@ -8,16 +8,15 @@ with open("README.rst", "r") as f:
     README_TEXT = f.read()
 
 ext_modules = cythonize([
-    Extension(
-        "rfcde.ForestWrapper",
-        sources=[
-            'src/rfcde/ForestWrapper.pyx', 'src/rfcde/Forest.cpp',
-            'src/rfcde/Tree.cpp', 'src/rfcde/Node.cpp', 'src/rfcde/Split.cpp',
-            'src/rfcde/helpers.cpp'
-        ],
-        extra_compile_args=['-std=c++11'],
-        include_dirs=[np.get_include(), "src/rfcde/"],
-        language='c++')
+    Extension("rfcde.ForestWrapper",
+              sources=[
+                  'src/rfcde/ForestWrapper.pyx', 'src/rfcde/Forest.cpp',
+                  'src/rfcde/Tree.cpp', 'src/rfcde/Node.cpp',
+                  'src/rfcde/Split.cpp', 'src/rfcde/helpers.cpp'
+              ],
+              extra_compile_args=['-std=c++11'],
+              include_dirs=[np.get_include(), "src/rfcde/"],
+              language='c++')
 ])
 
 for e in ext_modules:
@@ -25,7 +24,7 @@ for e in ext_modules:
 
 setup(
     name="rfcde",
-    version="0.2.1",
+    version="0.3",
     license="MIT",
     description=
     "Fits random forest conditional density estimate using conditional density loss for splits.",
