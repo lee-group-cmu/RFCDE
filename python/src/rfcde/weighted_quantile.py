@@ -18,7 +18,6 @@ def weighted_quantile(x, weights, quantile):
     float
        The weighted quantile
     """
-    np.interp(quantile, ecdf, x[perm])
     perm = np.argsort(x)
     sorted_weights = weights[perm]
     ecdf = np.cumsum(sorted_weights) / sum(weights)
