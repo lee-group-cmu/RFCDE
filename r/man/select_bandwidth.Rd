@@ -4,15 +4,16 @@
 \alias{select_bandwidth}
 \title{Helper function for selecting bandwidth for KDE}
 \usage{
-select_bandwidth(z, weights, method = "auto")
+select_bandwidth(z, weights, method = "plugin")
 }
 \arguments{
 \item{z}{A matrix of training responses.}
 
 \item{weights}{A vector of weights for training points.}
 
-\item{method}{(optional) Either "auto" for automatic bandwidth
-selection or a fixed bandwidth value or matrix. Defaults to "auto".}
+\item{method}{(optional) Either "plugin" for bandwidth selection by
+plug-in rule, "cv" for cross-validation, or a fixed bandwidth
+value or matrix. Defaults to "plugin".}
 }
 \value{
 A bandwidth for KDE

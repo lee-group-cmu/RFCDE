@@ -1,4 +1,4 @@
 library(testthat)
 library(RFCDE)
 
-test_check("RFCDE")
+testthat::test_check("RFCDE")

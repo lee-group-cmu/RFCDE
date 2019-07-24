@@ -6,7 +6,7 @@
 \arguments{
 \item{x_train}{a matrix of training covariates.}
 
-\item{z_basis}{a matrix of basis functions evaluations for training responses.}
+\item{z_basis}{a matrix of basis evaluations for training responses.}
 
 \item{n_trees}{the number of trees in the forest.}
 

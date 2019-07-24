@@ -4,7 +4,7 @@
 \alias{kde_estimate}
 \title{Helper function for kernel density estimation.}
 \usage{
-kde_estimate(z_train, z_grid, weights, bandwidth = "auto")
+kde_estimate(z_train, z_grid, weights, bandwidth = "plugin")
 }
 \arguments{
 \item{z_train}{matrix of training responses.}
@@ -13,8 +13,9 @@ kde_estimate(z_train, z_grid, weights, bandwidth = "auto")
 
 \item{weights}{vector of weights.}
 
-\item{bandwidth}{(optional) Either "auto" for automatic bandwidth
-selection or a fixed bandwidth value or matrix. Defaults to "auto".}
+\item{bandwidth}{(optional) Either "plugin" for bandwidth selection by
+plug-in rule, "cv" for cross-validation, or a fixed bandwidth
+value or matrix. Defaults to "plugin".}
 }
 \value{
 A vector of the density estimated at z_grid

@@ -8,17 +8,20 @@
 #' @param lens length of functional data
 #' @param n_trees the number of trees in the forest. Defaults to 1000.
 #' @param mtry the number of candidate variables to try for each
-#'   split. Defaults to the square root of the number of covariates.
+#'     split. Defaults to the square root of the number of covariates.
 #' @param node_size the minimum number of observations in a leaf node.
-#'   Defaults to 5.
+#'     Defaults to 5.
 #' @param n_basis the number of basis functions used in split density
-#'   estimates. Defaults to 31.
+#'     estimates. Defaults to 31.
 #' @param basis_system the system of basis functions to use; currently
-#'   "cosine" and "Haar" are supported. Defaults to "cosine"
-#' @param min_loss_delta the minimum loss for a split. Defaults to 0.0.
+#'     "cosine" and "Haar" are supported. Defaults to "cosine"
+#' @param min_loss_delta the minimum loss for a split. Defaults to
+#'     0.0.
+#' @param flambda (optional) tuning parameter determing partitioning
+#'     of functional data
 #' @param fit_oob whether to fit out-of-bag samples or not. Out-of-bag
-#'   samples increase the computation time but allows for estimation
-#'   of the prediction loss. Defaults to FALSE.
+#'     samples increase the computation time but allows for estimation
+#'     of the prediction loss. Defaults to FALSE.
 #' @export
 RFCDE <- function(x_train, z_train, lens = rep(1L, ncol(x_train)), #nolint
                   n_trees = 1000, mtry = sqrt(ncol(x_train)),
@@ -128,7 +131,8 @@ oob_weights <- function(forest) {
 
 #' Predict conditional density estimates for RFCDE objects.
 #'
-#' @usage \method{predict}{RFCDE}(object, newdata, z_grid, bandwidth, ...)
+#' @usage \method{predict}{RFCDE}(object, newdata, response, z_grid,
+#'     bandwidth, quantile, ...)
 #'
 #' @param object a RFCDE object.
 #' @param newdata matrix of test covariates.
@@ -183,7 +187,7 @@ predict.RFCDE <- function(object, newdata,
     for (ii in seq_len(n_test)) {
       wts <- weights(object, newdata[ii, , drop = FALSE]) #nolint
       wts <- wts * n_train / sum(wts)
-      means[ii] <- weighted.mean(object$z_train, t(wts))
+      means[ii] <- stats::weighted.mean(object$z_train, t(wts))
     }
     return(means)
   } else if (response == "quantile") {
