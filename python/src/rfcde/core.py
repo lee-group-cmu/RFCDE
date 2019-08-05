@@ -248,7 +248,8 @@ class RFCDE(object):
         means = np.zeros(n_test)
         for idx in range(n_test):
             weights = self.weights(np.ascontiguousarray(x_new[idx, :]))
-            means[idx] = np.average(self.z_train, weights=weights)
+            means[idx] = np.average(self.z_train.reshape(-1, ),
+                                    weights=weights)
         return means
 
     def predict_quantile(self, x_new, quantile):
@@ -276,5 +277,6 @@ class RFCDE(object):
         quantiles = np.zeros(n_test)
         for idx in range(n_test):
             weights = self.weights(np.ascontiguousarray(x_new[idx, :]))
-            quantiles[idx] = weighted_quantile(self.z_train, weights, quantile)
+            quantiles[idx] = weighted_quantile(self.z_train.reshape(-1, ),
+                                               weights, quantile)
         return quantiles
