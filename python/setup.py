@@ -24,7 +24,7 @@ for e in ext_modules:
 
 setup(
     name="rfcde",
-    version="0.3.1",
+    version="0.3.2",
     license="MIT",
     description=
     "Fits random forest conditional density estimate using conditional density loss for splits.",
