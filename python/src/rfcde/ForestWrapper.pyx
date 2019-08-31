@@ -18,6 +18,8 @@ cdef extern from "Forest.h":
                    bool fit_oob)
         void fill_weights(double* x_test, long* wt_buf);
         void fill_oob_weights(long* wt_mat);
+        void fill_loss_importance(double* imp);
+        void fill_count_importance(double* imp);
 
 cdef class ForestWrapper:
     """Wrapper for C++ implementation of RFCDE forests.
@@ -122,3 +124,41 @@ cdef class ForestWrapper:
         wt_mat = np.zeros((self.n_train, self.n_train), dtype=int, order="F")
         self.fill_oob_weights(wt_mat)
         return wt_mat
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def fill_loss_importance(self, np.ndarray[double, ndim=1, mode="c"] imp):
+        """Calculate variable importances from forest tree structure.
+
+        Arguments
+        ---------
+        imp : numpy array
+            An empty buffer to fill with variable importances. Must have length
+            equal to the number of covariates.
+
+        Returns
+        -------
+        numpy array
+            The loss importance measures for each variable.
+
+        """
+        self.Cpp_Class.fill_loss_importance(&imp[0])
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def fill_count_importance(self, np.ndarray[double, ndim=1, mode="c"] imp):
+        """Calculate variable importances from forest tree structure.
+
+        Arguments
+        ---------
+        imp : numpy array
+            An empty buffer to fill with variable importances. Must have length
+            equal to the number of covariates.
+
+        Returns
+        -------
+        numpy array
+            The count importance measures for each variable.
+
+        """
+        self.Cpp_Class.fill_count_importance(&imp[0])
