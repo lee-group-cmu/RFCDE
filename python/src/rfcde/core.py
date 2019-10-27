@@ -95,6 +95,8 @@ class RFCDE(object):
         self.basis_system = basis_system
         self.lens = None
         self.forest = ForestWrapper()
+        self.n_var = None
+        self.fit_oob = False
 
     def train(self, x_train, z_train, lens=None, flambda=1.0, fit_oob=False):
         """Train RFCDE object on training data.
@@ -152,7 +154,7 @@ class RFCDE(object):
 
         Arguments
         ---------
-        x_test : numpy array
+        x_new : numpy array
             A new observation.
 
         Returns

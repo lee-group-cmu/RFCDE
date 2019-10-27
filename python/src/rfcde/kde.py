@@ -33,7 +33,6 @@ def kde(responses, grid, weights, bandwidth):
     """
     n_grid, n_dim = grid.shape
     n_obs, _ = responses.shape
-    density = np.zeros(n_grid)
 
     responses = responses[weights > 0, :]
     weights = weights[weights > 0]
