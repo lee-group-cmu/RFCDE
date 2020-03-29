@@ -280,3 +280,15 @@ class RFCDE(object):
             quantiles[idx] = weighted_quantile(self.z_train.reshape(-1, ),
                                                weights, quantile)
         return quantiles
+
+    def variable_importance(self, type="count"):
+        n_x = self.n_var
+        imp = np.zeros(n_x)
+        if type == "count":
+            self.forest.fill_count_importance(imp)
+        elif type == "loss":
+            self.forest.fill_loss_importance(imp)
+            counts = np.zeros(n_x)
+            self.forest.fill_count_importance(counts)
+            imp = imp / counts
+        return imp
