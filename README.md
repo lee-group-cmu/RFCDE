@@ -149,3 +149,4 @@ Troubleshooting (Python)
     If the pip installation does not work, try 
     * Set the global variable `export MACOSX_DEPLOYMENT_TARGET=10.X` (where 10.X is the OS version - for Mojave is 10.14), and then re-run the installation
     * Include `CFLAGS='-stdlib=libstdc++'` before pip install command, so `CFLAGS='-stdlib=libstdc++' pip install rfcde`
+3. If installing on Mac OS Catalina with Python 3.8, Apple runs Python with `-arch arm64`, which makes the C++ code failing to install. One should run `export ARCHFLAGS="-arch x86_64"` first to setup the `-arch` flag correctly. (see [this issue](https://github.com/giampaolo/psutil/issues/1832)).
